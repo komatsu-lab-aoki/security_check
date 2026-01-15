@@ -1,0 +1,41 @@
+{# templates/start.html #}
+{% extends "base.html" %}
+{% block title %}診断トップ | ITリスク自己診断{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="/">トップ</a>
+  <span>›</span>
+  <span>ITリスク自己診断</span>
+</div>
+
+<h1 class="page-title serif">ITリスク自己診断（弁護士事務所向け）</h1>
+
+<div class="card">
+  <div class="section-title">この診断について</div>
+
+  <div class="note" style="margin-top:8px;">
+    所要時間：10〜15分（全{{ total_sections }}カテゴリ）
+  </div>
+
+  <ul class="list" style="margin-top:10px;">
+    <li>この診断は監査・評価ではありません。</li>
+    <li>現状整理と、優先して整備すべき点を把握するためのセルフチェックです。</li>
+    <li>回答は保存しません（必要なら後日、保存方式に変更できます）。</li>
+  </ul>
+
+  <form method="post" action="{{ url_for('start') }}" style="margin-top:16px;">
+    <button class="btn primary" type="submit">診断を開始する</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="section-title">進め方</div>
+  <ol class="list" style="margin-top:10px;">
+    <li>各設問に「はい／いいえ／わからない」で回答します。</li>
+    <li>結果画面で、全設問の確認ポイントが一覧表示されます。</li>
+  </ol>
+</div>
+
+{% endblock %}
