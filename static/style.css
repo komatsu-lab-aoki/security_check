@@ -328,3 +328,95 @@ a:hover{ text-decoration:underline; }
 .badge.high{ color:var(--high); background:var(--high-bg); border-color:#e6c9c9; }
 .badge.medium{ color:var(--medium); background:var(--medium-bg); border-color:#e2d3b2; }
 .badge.low{ color:var(--low); background:var(--low-bg); border-color:#c9dbe8; }
+
+/* ===== 分野別サマリ（表） ===== */
+.table-wrap{
+  overflow:auto;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.summary-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px; /* スマホ横スクロール対策 */
+}
+
+.summary-table thead th{
+  position: sticky; /* 任意：スクロール時にヘッダ固定 */
+  top: 0;
+  z-index: 1;
+  background: #fbfbfa;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .02em;
+  font-weight: 900;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.summary-table thead tr:first-child th{
+  padding-top: 12px;
+  padding-bottom: 8px;
+}
+
+.summary-table thead .col-group{
+  text-align:center;
+}
+
+.summary-table tbody td{
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  vertical-align: middle;
+}
+
+.summary-table tbody tr:hover td{
+  background: #fcfcfb;
+}
+
+.summary-table tbody tr:last-child td{
+  border-bottom: none;
+}
+
+.summary-table .col-area{ width: 34%; }
+.summary-table .col-num{ width: 8%; }
+.summary-table .col-total{ width: 8%; }
+
+.summary-table .area-title{
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.summary-table .area-sub{
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.summary-table .num{
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.summary-table .num.total{
+  font-weight: 900;
+  color: var(--text);
+}
+
+/* リスク列の“それっぽい”強調（色は既存変数に合わせる） */
+.summary-table th.high,
+.summary-table td.high{ color: var(--high); }
+.summary-table th.medium,
+.summary-table td.medium{ color: var(--medium); }
+.summary-table th.low,
+.summary-table td.low{ color: var(--low); }
+
+/* スマホで分野欄を詰める */
+@media (max-width: 720px){
+  .summary-table{ min-width: 720px; }
+}

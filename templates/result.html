@@ -47,6 +47,57 @@
 </div>
 
 <div class="card">
+  <div class="section-title">サマリ（分野別）</div>
+  <p class="note">※「リスク別」は（いいえ／不明）と回答した設問のみを集計した件数です。</p>
+
+  <div class="table-wrap">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th class="col-area" rowspan="2">分野</th>
+          <th class="col-total" rowspan="2">全件</th>
+          <th class="col-group" colspan="3">回答内訳</th>
+          <th class="col-group" colspan="3">リスク別</th>
+        </tr>
+        <tr>
+          <th class="col-num">はい</th>
+          <th class="col-num">いいえ</th>
+          <th class="col-num">不明</th>
+
+          <th class="col-num high">高</th>
+          <th class="col-num medium">中</th>
+          <th class="col-num low">低</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in section_summary %}
+        <tr>
+          <td class="area">
+            <div class="area-title">{{ s.title }}</div>
+          </td>
+
+          <!-- 全件 -->
+          <td class="num total">{{ s.total }}</td>
+
+          <!-- 回答内訳 -->
+          <td class="num">{{ s.answers.yes }}</td>
+          <td class="num">{{ s.answers.no }}</td>
+          <td class="num">{{ s.answers.unknown }}</td>
+          
+          <!-- 指摘（リスク別） -->
+          <td class="num high">{{ s.hit_by_risk.high }}</td>
+          <td class="num medium">{{ s.hit_by_risk.medium }}</td>
+          <td class="num low">{{ s.hit_by_risk.low }}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
   <div class="section-title">確認項目一覧（全件）</div>
   <div class="note">※回答にかかわらず全て表示します（「はい」も含みます）。</div>
 </div>

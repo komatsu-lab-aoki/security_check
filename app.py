@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from flask import Flask, render_template, request, redirect, url_for, session
-
 from questions import (
     SECTIONS,
     CHOICES,
@@ -13,6 +12,7 @@ from questions import (
     iter_items,
     validate_questions,
 )
+from collections import defaultdict
 
 app = Flask(__name__)
 app.secret_key = "change-me"  # 本番は環境変数へ
@@ -167,6 +167,49 @@ def section(idx: int):
         choices=CHOICES,
     )
 
+from collections import defaultdict
+
+def build_section_summary(answers: dict):
+    """
+    セクション（backup / device / network ...）単位のサマリ
+    """
+    summary = defaultdict(lambda: {
+        "section_id": "",
+        "title": "",
+        "total": 0,
+        "answers": {"yes": 0, "no": 0, "unknown": 0},
+        "hit_total": 0,
+        "hit_by_risk": {"high": 0, "medium": 0, "low": 0},
+    })
+
+    for sec, item in iter_items():
+        sid = sec["id"]                # ★ グループキー
+        title = sec["title"]
+        qid = item["id"]
+
+        ans = answers.get(qid)
+        if ans not in VALID_ANSWERS:
+            ans = "unknown"
+
+        risk = item.get("risk", "medium")
+        if risk not in RISK_LABELS:
+            risk = "medium"
+
+        s = summary[sid]
+        s["section_id"] = sid
+        s["title"] = title
+        s["total"] += 1
+        s["answers"][ans] += 1
+
+        show_if = item.get("show_if_answer_in", ["no", "unknown"])
+        if ans in show_if:
+            s["hit_total"] += 1
+            s["hit_by_risk"][risk] += 1
+
+    rows = list(summary.values())
+    rows.sort(key=lambda r: -r["hit_total"])  # 指摘多い順
+    return rows
+
 def build_rows_all(answers: dict) -> list[dict]:
     rows = []
     for sec, item in iter_items():
@@ -212,7 +255,6 @@ def build_rows_all(answers: dict) -> list[dict]:
 def result():
     answers = session.get("answers", {})
 
-    # サマリは「回答が yes 以外の件数」だけを数えるのがおすすめ
     counts = {"high": 0, "medium": 0, "low": 0}
     for sec, item in iter_items():
         ans = answers.get(item["id"])
@@ -223,15 +265,19 @@ def result():
             counts[risk] += 1
 
     overall = overall_judgement(counts)
-
     all_rows = build_rows_all(answers)
+
+    # ★追加：グループ別サマリ
+    section_summary = build_section_summary(answers)
 
     return render_template(
         "result.html",
         overall=overall,
         counts=counts,
         all_rows=all_rows,
+        section_summary=section_summary,  # ← ここ
     )
+
 
 
 if __name__ == "__main__":
