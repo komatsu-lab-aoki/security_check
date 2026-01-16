@@ -8,22 +8,19 @@
   <span>結果</span>
 </div>
 
-<h1 class="page-title serif">ITリスク自己診断（結果）</h1>
+<h1 class="page-title serif">自己診断結果</h1>
 
-<div class="card">
-  <div class="section-title">
-    <span>総評</span>
+<section class="plain-block overall-block">
+  <div class="plain-head">
+    <h2 class="plain-title">総評</h2>
     <span class="badge {% if overall.code == '優先対応' %}high{% elif overall.code == '要整理' %}medium{% else %}low{% endif %}">
       {{ overall.code }}
     </span>
   </div>
-  <div style="color:var(--muted); font-size:13px;">
-    {{ overall.message }}
-  </div>
-  <div style="margin-top:10px;">
-    {{ overall.lead }}
-  </div>
-</div>
+
+  <p class="overall-lead">{{ overall.message }}</p>
+  <p class="overall-lead">{{ overall.lead }}</p>
+</section>
 
 <div class="card">
   <div class="section-title">サマリ（件数）</div>
@@ -46,9 +43,10 @@
   </div>
 </div>
 
+{# ===== サマリ（分野別） ===== #}
 <div class="card">
   <div class="section-title">サマリ（分野別）</div>
-  <p class="note">※「リスク別」は（いいえ／不明）と回答した設問のみを集計した件数です。</p>
+  <p class="note">※「指摘」は（いいえ／不明）など結果表示対象になった件数です。</p>
 
   <div class="table-wrap">
     <table class="summary-table">
@@ -57,19 +55,19 @@
           <th class="col-area" rowspan="2">分野</th>
           <th class="col-total" rowspan="2">全件</th>
           <th class="col-group" colspan="3">回答内訳</th>
-          <th class="col-group" colspan="3">リスク別</th>
+          <th class="col-group" colspan="3">指摘（リスク別）</th>
         </tr>
         <tr>
           <th class="col-num">はい</th>
           <th class="col-num">いいえ</th>
           <th class="col-num">不明</th>
-
           <th class="col-num high">高</th>
           <th class="col-num medium">中</th>
           <th class="col-num low">低</th>
 
         </tr>
       </thead>
+
       <tbody>
         {% for s in section_summary %}
         <tr>
@@ -77,15 +75,12 @@
             <div class="area-title">{{ s.title }}</div>
           </td>
 
-          <!-- 全件 -->
           <td class="num total">{{ s.total }}</td>
 
-          <!-- 回答内訳 -->
           <td class="num">{{ s.answers.yes }}</td>
           <td class="num">{{ s.answers.no }}</td>
           <td class="num">{{ s.answers.unknown }}</td>
-          
-          <!-- 指摘（リスク別） -->
+
           <td class="num high">{{ s.hit_by_risk.high }}</td>
           <td class="num medium">{{ s.hit_by_risk.medium }}</td>
           <td class="num low">{{ s.hit_by_risk.low }}</td>
@@ -97,65 +92,79 @@
   </div>
 </div>
 
-<div class="card">
-  <div class="section-title">確認項目一覧（全件）</div>
-  <div class="note">※回答にかかわらず全て表示します（「はい」も含みます）。</div>
-</div>
-
-{% for r in all_rows %}
-  <div class="card">
-    <div class="section-title">
-      <span>{{ loop.index }}. {{ r.section_title }}</span>
-      <span class="badge {{ r.risk }}">{{ "リスク：" ~ r.risk_label }}</span>
-    </div>
-
-    <div style="font-weight:800; margin-top:4px;">
-      {{ r.question }}
-    </div>
-
-    <div class="kv">
-      <div class="item"><span class="key">回答</span>{{ r.answer_label }}</div>
-    </div>
-
-    {# 解説は「はい」以外だけ表示（読みやすさ優先）。全部出したいならこの if を外す #}
-    {% if r.answer != "yes" %}
-      {% if r.title %}
-        <div style="margin-top:12px;">
-          <div style="font-weight:800;">要点</div>
-          <div>{{ r.title }}</div>
-        </div>
-      {% endif %}
-
-      {% if r.why %}
-        <div style="margin-top:12px;">
-          <div style="font-weight:800;">背景</div>
-          <div style="color:var(--muted);">{{ r.why }}</div>
-        </div>
-      {% endif %}
-
-      {% if r.next and r.next|length > 0 %}
-        <div style="margin-top:12px;">
-          <div style="font-weight:800;">次の一手</div>
-          <ul class="list">
-            {% for n in r.next %}
-              <li>{{ n }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-      {% endif %}
-    {% else %}
-      <div class="note" style="margin-top:10px;">
-        ※「はい」の項目は、現状維持で問題ありません。
-      </div>
-    {% endif %}
+<section class="plain-block list-head">
+  <div class="plain-head">
+    <h2 class="plain-title">確認項目一覧（分野別）</h2>
   </div>
+  <p class="note">※回答にかかわらず全て表示します（「はい」も含みます）。</p>
+</section>
+
+{% for sec in sections %}
+  <details class="genre">
+    <summary class="genre-summary">
+      <div class="genre-left">
+        <span class="genre-title">{{ sec.title }}</span>
+        <span class="genre-meta">全{{ sec.total }}件 / 指摘：高{{ sec.hit_by_risk.high }}・中{{ sec.hit_by_risk.medium }}・低{{ sec.hit_by_risk.low }}</span>
+      </div>
+
+      <div class="genre-right">
+        <span class="genre-hint"></span>
+        <span class="genre-arrow" aria-hidden="true">▾</span>
+      </div>
+    </summary>
+
+    <div class="genre-body">
+      {% for r in sec.rows %}
+        <div class="item-card">
+          <div class="item-head">
+            <div class="item-q">
+              <span class="item-no">{{ loop.index }}</span>
+              <span>{{ r.question }}</span>
+            </div>
+            <span class="badge {{ r.risk }}">{{ "リスク：" ~ r.risk_label }}</span>
+          </div>
+
+          <div class="kv">
+            <div class="item"><span class="key">回答</span>{{ r.answer_label }}</div>
+          </div>
+
+          {% if r.answer != "yes" %}
+            {% if r.title %}
+              <div class="item-block">
+                <div class="item-label">要点</div>
+                <div>{{ r.title }}</div>
+              </div>
+            {% endif %}
+
+            {% if r.why %}
+              <div class="item-block">
+                <div class="item-label">背景</div>
+                <div class="muted">{{ r.why }}</div>
+              </div>
+            {% endif %}
+
+            {% if r.next and r.next|length > 0 %}
+              <div class="item-block">
+                <div class="item-label">次の一手</div>
+                <ul class="list">
+                  {% for n in r.next %}
+                    <li>{{ n }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="note" style="margin-top:10px;">※「はい」の項目は、現状維持で問題ありません。</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </details>
 {% endfor %}
 
-<div class="card">
-  <div class="note">
-    ※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。<br>
-    ※回答内容はサーバに保存しない前提で構成しています（今後、保存方式は変更可能です）。
-  </div>
+<div class="page-note">
+  <p>※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。</p>
+  <p>※回答内容はサーバに保存しない前提で構成しています（今後、保存方式は変更可能です）。</p>
 </div>
 
 {% endblock %}

@@ -1,7 +1,10 @@
 # app.py
 from __future__ import annotations
 
+from collections import defaultdict
+
 from flask import Flask, render_template, request, redirect, url_for, session
+
 from questions import (
     SECTIONS,
     CHOICES,
@@ -12,7 +15,6 @@ from questions import (
     iter_items,
     validate_questions,
 )
-from collections import defaultdict
 
 app = Flask(__name__)
 app.secret_key = "change-me"  # 本番は環境変数へ
@@ -167,49 +169,6 @@ def section(idx: int):
         choices=CHOICES,
     )
 
-from collections import defaultdict
-
-def build_section_summary(answers: dict):
-    """
-    セクション（backup / device / network ...）単位のサマリ
-    """
-    summary = defaultdict(lambda: {
-        "section_id": "",
-        "title": "",
-        "total": 0,
-        "answers": {"yes": 0, "no": 0, "unknown": 0},
-        "hit_total": 0,
-        "hit_by_risk": {"high": 0, "medium": 0, "low": 0},
-    })
-
-    for sec, item in iter_items():
-        sid = sec["id"]                # ★ グループキー
-        title = sec["title"]
-        qid = item["id"]
-
-        ans = answers.get(qid)
-        if ans not in VALID_ANSWERS:
-            ans = "unknown"
-
-        risk = item.get("risk", "medium")
-        if risk not in RISK_LABELS:
-            risk = "medium"
-
-        s = summary[sid]
-        s["section_id"] = sid
-        s["title"] = title
-        s["total"] += 1
-        s["answers"][ans] += 1
-
-        show_if = item.get("show_if_answer_in", ["no", "unknown"])
-        if ans in show_if:
-            s["hit_total"] += 1
-            s["hit_by_risk"][risk] += 1
-
-    rows = list(summary.values())
-    rows.sort(key=lambda r: -r["hit_total"])  # 指摘多い順
-    return rows
-
 def build_rows_all(answers: dict) -> list[dict]:
     rows = []
     for sec, item in iter_items():
@@ -251,10 +210,112 @@ def build_rows_all(answers: dict) -> list[dict]:
     # rows.sort(key=lambda r: (order.get(r["risk"], 9)))
     return rows
 
+
+def build_section_summary(answers: dict) -> tuple[list[dict], dict]:
+    """セクション（device/backup/...）単位のサマリを作る。
+
+    - 指摘：item.show_if_answer_in に該当した件数（通常 no/unknown）
+    - リスク別：high/medium/low
+    - 回答内訳：yes/no/unknown
+
+    戻り値は (rows_list, rows_by_section_id)
+    """
+
+    summary = defaultdict(
+        lambda: {
+            "section_id": "",
+            "title": "",
+            "total": 0,
+            "answers": {"yes": 0, "no": 0, "unknown": 0},
+            "hit_total": 0,
+            "hit_by_risk": {"high": 0, "medium": 0, "low": 0},
+        }
+    )
+
+    for sec, item in iter_items():
+        sid = sec["id"]
+        qid = item["id"]
+
+        ans = answers.get(qid)
+        if ans not in VALID_ANSWERS:
+            ans = "unknown"
+
+        risk = item.get("risk", "medium")
+        if risk not in RISK_LABELS:
+            risk = "medium"
+
+        s = summary[sid]
+        s["section_id"] = sid
+        s["title"] = sec.get("title", sid)
+        s["total"] += 1
+        s["answers"][ans] += 1
+
+        show_if = item.get("show_if_answer_in", ["no", "unknown"])
+        if ans in show_if:
+            s["hit_total"] += 1
+            s["hit_by_risk"][risk] += 1
+
+    # 表示順は設問定義順（SECTIONS順）に合わせる
+    rows = [summary[sec["id"]] for sec in SECTIONS if sec["id"] in summary]
+    by_id = {r["section_id"]: r for r in rows}
+    return rows, by_id
+
+
+def build_rows_by_section(answers: dict, section_summary_by_id: dict) -> list[dict]:
+    """セクション単位に、全設問の rows をまとめて返す（ジャンル分け表示用）"""
+
+    buckets: list[dict] = []
+    for sec in SECTIONS:
+        rows: list[dict] = []
+        for item in sec["items"]:
+            qid = item["id"]
+            ans = answers.get(qid)
+            if ans not in VALID_ANSWERS:
+                ans = "unknown"
+
+            risk = item.get("risk", "medium")
+            if risk not in RISK_LABELS:
+                risk = "medium"
+
+            res = {}
+            if "result_by_answer" in item and isinstance(item["result_by_answer"], dict):
+                res = item["result_by_answer"].get(ans, {}) or {}
+            if not res:
+                res = item.get("result", {}) or {}
+
+            rows.append(
+                {
+                    "risk": risk,
+                    "risk_label": RISK_LABELS[risk]["label"],
+                    "question": item["q"],
+                    "answer": ans,
+                    "answer_label": ANSWER_LABEL.get(ans, ans),
+                    "title": res.get("title", ""),
+                    "why": res.get("why", ""),
+                    "next": res.get("next", []) or [],
+                }
+            )
+
+        ssum = section_summary_by_id.get(sec["id"], {})
+        buckets.append(
+            {
+                "section_id": sec["id"],
+                "title": sec["title"],
+                "total": ssum.get("total", len(rows)),
+                "hit_total": ssum.get("hit_total", 0),
+                "hit_by_risk": ssum.get("hit_by_risk", {"high": 0, "medium": 0, "low": 0}),
+                "answers": ssum.get("answers", {"yes": 0, "no": 0, "unknown": 0}),
+                "rows": rows,
+            }
+        )
+
+    return buckets
+
 @app.route("/check/result")
 def result():
     answers = session.get("answers", {})
 
+    # サマリは「回答が yes 以外の件数」だけを数えるのがおすすめ
     counts = {"high": 0, "medium": 0, "low": 0}
     for sec, item in iter_items():
         ans = answers.get(item["id"])
@@ -265,19 +326,24 @@ def result():
             counts[risk] += 1
 
     overall = overall_judgement(counts)
-    all_rows = build_rows_all(answers)
 
-    # ★追加：グループ別サマリ
-    section_summary = build_section_summary(answers)
+    # 分野別サマリ（= セクション別サマリ）
+    section_summary, section_summary_by_id = build_section_summary(answers)
+
+    # 詳細表示用：セクション（①〜⑤など）でジャンル分け
+    sections = build_rows_by_section(answers, section_summary_by_id)
+
+    # 互換：テンプレで使っている場合に備えて残す（不要なら削除OK）
+    all_rows = build_rows_all(answers)
 
     return render_template(
         "result.html",
         overall=overall,
         counts=counts,
         all_rows=all_rows,
-        section_summary=section_summary,  # ← ここ
+        section_summary=section_summary,
+        sections=sections,
     )
-
 
 
 if __name__ == "__main__":

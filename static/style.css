@@ -219,6 +219,146 @@ a:hover{ text-decoration:underline; }
 .serif{ font-family: "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif; letter-spacing:.02em; }
 .page-title{ margin: 8px 0 16px; font-size: 28px; line-height: 1.25; }
 
+/* ===== 分野別サマリ（表） ===== */
+.table-wrap{
+  overflow:auto;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.summary-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px; /* スマホ横スクロール */
+}
+
+.summary-table thead th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fbfbfa;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .02em;
+  font-weight: 900;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.summary-table thead th.col-area{ text-align: left; }
+
+.summary-table tbody td{
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  vertical-align: middle;
+}
+
+.summary-table tbody tr:hover td{ background: #fcfcfb; }
+.summary-table tbody tr:last-child td{ border-bottom: none; }
+
+.summary-table .col-area{ width: 36%; }
+.summary-table .col-num{ width: 9%; }
+.summary-table .col-total{ width: 9%; }
+
+.summary-table .area-title{ font-weight: 900; line-height: 1.4; }
+.summary-table .num{ text-align: center; font-variant-numeric: tabular-nums; font-weight: 800; }
+.summary-table .num.total{ font-weight: 900; }
+
+.summary-table th.high, .summary-table td.high{ color: var(--high); }
+.summary-table th.medium, .summary-table td.medium{ color: var(--medium); }
+.summary-table th.low, .summary-table td.low{ color: var(--low); }
+
+/* ===== ジャンル（①〜⑤）で折りたたみ表示 ===== */
+.genre{
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.genre[open]{ box-shadow: 0 1px 0 rgba(15,23,42,.03); }
+
+.genre-summary{
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* 標準の三角マーカーを消す（Chrome/Edge） */
+.genre-summary::-webkit-details-marker{ display:none; }
+
+.genre-left{ min-width: 0; }
+.genre-title{ font-weight: 900; }
+.genre-sub{ margin-top: 2px; font-size: 12px; color: var(--muted); }
+
+.genre-count{
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--primary-weak);
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.genre-body{
+  border-top: 1px solid var(--line);
+  padding: 14px 14px;
+}
+
+/* ===== 項目カード（セクション内） ===== */
+.item-card{
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 14px;
+  background: #fff;
+}
+
+.item-card + .item-card{ margin-top: 12px; }
+
+.item-head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.item-q{ font-weight: 900; line-height: 1.5; }
+.item-no{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: #f2f1ec;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--muted);
+}
+
+.item-block{ margin-top: 12px; }
+.item-label{ font-weight: 900; margin-bottom: 4px; }
+.muted{ color: var(--muted); }
+
+@media (max-width: 720px){
+  .summary-table{ min-width: 720px; }
+}
+
 .breadcrumb{ display:flex; gap:10px; align-items:center; color:var(--muted); font-size:13px; margin-bottom:10px; }
 .breadcrumb span{ color:var(--muted); }
 
@@ -329,94 +469,362 @@ a:hover{ text-decoration:underline; }
 .badge.medium{ color:var(--medium); background:var(--medium-bg); border-color:#e2d3b2; }
 .badge.low{ color:var(--low); background:var(--low-bg); border-color:#c9dbe8; }
 
-/* ===== 分野別サマリ（表） ===== */
-.table-wrap{
-  overflow:auto;
-  margin-top: 10px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--card);
+/* ===== 非カード（総評 / 一覧見出し） ===== */
+.plain-block{
+  margin: 18px 0;
+  padding: 16px 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-.summary-table{
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 760px; /* スマホ横スクロール対策 */
+.plain-block + .card{ margin-top: 10px; }
+
+.plain-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
 }
 
-.summary-table thead th{
-  position: sticky; /* 任意：スクロール時にヘッダ固定 */
-  top: 0;
-  z-index: 1;
-  background: #fbfbfa;
+.plain-title{
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: .01em;
+}
+
+.overall-block{
+  padding-top: 10px;
+  padding-bottom: 14px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.overall-message{
+  margin: 8px 0 0;
   color: var(--muted);
+  font-size: 13px;
+}
+
+.overall-lead{
+  margin: 10px 0 0;
+}
+
+.list-head{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top: 1px solid var(--line);
+}
+
+/* ===== ジャンル折りたたみ：初期閉 + 展開を明示 ===== */
+details.genre > summary{
+  list-style: none;           /* デフォルトの三角を消す */
+  cursor: pointer;
+}
+details.genre > summary::-webkit-details-marker{
+  display:none;
+}
+
+.genre-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.genre-left{ min-width: 0; }
+.genre-title{
+  font-weight: 900;
+}
+.genre-meta{
+  display:block;
+  margin-top: 4px;
   font-size: 12px;
-  letter-spacing: .02em;
-  font-weight: 900;
-  padding: 10px 10px;
-  border-bottom: 1px solid var(--line);
+  color: var(--muted);
 }
 
-.summary-table thead tr:first-child th{
-  padding-top: 12px;
-  padding-bottom: 8px;
+.genre-right{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.summary-table thead .col-group{
-  text-align:center;
-}
-
-.summary-table tbody td{
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--line);
+.genre-hint{
+  font-size: 12px;
+  color: var(--muted);
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   background: #fff;
-  vertical-align: middle;
 }
 
-.summary-table tbody tr:hover td{
-  background: #fcfcfb;
+/* 右端の矢印（回転で開閉が分かる） */
+details.genre > summary::after{
+  content: "▾";
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+details.genre[open] > summary::after{
+  transform: rotate(180deg);
 }
 
-.summary-table tbody tr:last-child td{
-  border-bottom: none;
+/* 開いた時は「折りたたむ」に文言変更（視認性UP） */
+details.genre[open] .genre-hint{
+  content: none;
+}
+details.genre[open] .genre-hint::before{
+  content: "クリックで折りたたみ";
 }
 
-.summary-table .col-area{ width: 34%; }
-.summary-table .col-num{ width: 8%; }
-.summary-table .col-total{ width: 8%; }
+/* ===== ジャンル見出し：右側に寄せて整える ===== */
+details.genre > summary{
+  list-style: none;
+  cursor: pointer;
+}
+details.genre > summary::-webkit-details-marker{ display:none; }
 
-.summary-table .area-title{
+.genre-summary{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.genre-left{
+  min-width: 0;
+}
+
+.genre-title{
   font-weight: 900;
-  line-height: 1.4;
 }
 
-.summary-table .area-sub{
+.genre-meta{
+  display:block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ★ここが右寄せの肝 */
+.genre-right{
+  margin-left: auto;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.genre-hint{
+  font-size: 12px;
+  color: var(--muted);
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  white-space: nowrap;
+}
+
+/* 開閉で文言を切り替え */
+details.genre .genre-hint::before{ content:"クリックで展開"; }
+details.genre[open] .genre-hint::before{ content:"クリックで折りたたみ"; }
+
+/* 矢印も右端に固定・回転 */
+.genre-arrow{
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+  transition: transform .15s ease;
+}
+details.genre[open] .genre-arrow{
+  transform: rotate(180deg);
+}
+
+/* 以前の summary::after を使っている場合は無効化 */
+details.genre > summary::after{ content: none !important; }
+
+/* ===== ページ注記（カードにしない） ===== */
+.page-note{
+  margin: 14px 0 18px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.page-note p{
+  margin: 6px 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ===== TOP（重厚・紙資料風） ===== */
+.hero{
+  margin-top: 8px;
+  padding: 6px 0 10px;
+}
+.hero-kicker{
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: .02em;
+}
+.hero-title{
+  margin: 10px 0 6px;
+  font-size: 34px;
+  font-weight: 900;
+}
+.hero-meta{
+  font-size: 12px;
+  color: var(--muted);
+  display:flex;
+  align-items:center;
+  gap: 8px;
+}
+.hero-meta .dot{ opacity: .6; }
+
+.paper{
+  margin: 18px 0 8px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.paper-head{
+  display:flex;
+  align-items:flex-end;
+  gap: 14px;
+}
+.paper-title{
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+}
+.paper-rule{
+  flex: 1;
+  height: 3px;
+  background: rgba(34, 90, 60, .18); /* 緑系の控えめライン */
+  border-radius: 999px;
+  transform: translateY(-3px);
+}
+
+.paper-grid{
+  margin-top: 16px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 860px){
+  .paper-grid{ grid-template-columns: 1fr; }
+}
+
+.paper-box{
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 14px;
+}
+.paper-box-head{
+  display:flex;
+  gap: 10px;
+  align-items:flex-start;
+}
+.paper-ico{
+  width: 30px;
+  height: 30px;
+  display:grid;
+  place-items:center;
+  border-radius: 999px;
+  background: rgba(34, 90, 60, .10);
+  color: rgba(34, 90, 60, .95);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.paper-box-title{
+  font-weight: 900;
+}
+.paper-box-sub{
   margin-top: 2px;
   font-size: 12px;
   color: var(--muted);
 }
-
-.summary-table .num{
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  font-weight: 800;
-}
-
-.summary-table .num.total{
-  font-weight: 900;
+.paper-text{
+  margin: 10px 0 0;
   color: var(--text);
+  line-height: 1.75;
+  font-size: 13px;
 }
 
-/* リスク列の“それっぽい”強調（色は既存変数に合わせる） */
-.summary-table th.high,
-.summary-table td.high{ color: var(--high); }
-.summary-table th.medium,
-.summary-table td.medium{ color: var(--medium); }
-.summary-table th.low,
-.summary-table td.low{ color: var(--low); }
+.paper-list{
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 13px;
+}
 
-/* スマホで分野欄を詰める */
-@media (max-width: 720px){
-  .summary-table{ min-width: 720px; }
+.paper-cta{
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-hero{
+  padding: 12px 18px;
+  font-weight: 900;
+  border-radius: 14px;
+}
+.paper-cta-note{
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ===== ベース全体（重厚・資料感） ===== */
+body{
+  background:#faf9f6;              /* 真っ白を避ける */
+  color:#222;
+}
+
+.container{
+  max-width: 980px;                /* 紙資料っぽい幅 */
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+}
+/* ===== ヘッダー ===== */
+.header{
+  padding: 6px 0 18px;
+  border-bottom: 2px solid #e2e0db;   /* 太めの区切り線 */
+  margin-bottom: 26px;
+}
+
+.brand{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.subtitle{
+  margin-top: 6px;
+  font-size: 13px;
+  color:#666;
+}
+.hr{
+  margin: 36px 0 12px;
+  border-top: 1px solid #e2e0db;
+}
+.note{
+  font-size: 12px;
+  color:#777;
+  text-align: center;
+  margin-top: 12px;
+}
+
+body{
+  font-variant-numeric: tabular-nums;
 }
