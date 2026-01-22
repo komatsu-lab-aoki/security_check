@@ -6,6 +6,12 @@
   <a href="/check">診断トップへ戻る</a>
   <span>›</span>
   <span>結果</span>
+
+  {# PDFボタン：画面表示時のみ表示（PDF内には不要） #}
+  {% if not is_pdf %}
+    <span style="margin-left:auto;"></span>
+    <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
+  {% endif %}
 </div>
 
 <h1 class="page-title serif">自己診断結果</h1>
@@ -64,7 +70,6 @@
           <th class="col-num high">高</th>
           <th class="col-num medium">中</th>
           <th class="col-num low">低</th>
-
         </tr>
       </thead>
 
@@ -100,7 +105,8 @@
 </section>
 
 {% for sec in sections %}
-  <details class="genre">
+  {# PDF時は open を付けて強制展開 #}
+  <details class="genre" {% if is_pdf %}open{% endif %}>
     <summary class="genre-summary">
       <div class="genre-left">
         <span class="genre-title">{{ sec.title }}</span>
