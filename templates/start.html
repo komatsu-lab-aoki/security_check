@@ -19,8 +19,14 @@
 </header>
 
 <div class="page-note">
-  <p>※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。</p>
-  <p>※回答内容は保存しません（必要なら後日、保存方式に変更できます）。</p>
+  <p>
+  ※本診断は、監査・是正指示・評価を目的としたものではありません。<br>
+  事務所内のIT・情報管理の現状を整理し、対応の優先順位を把握するためのセルフチェックです。
+  </p>
+  <p>
+  ※ご回答内容は外部へ送信・保存されることはありません。<br>
+  守秘義務や依頼者情報に影響することなく、安心してご利用いただけます。
+  </p>
 </div>
 
 <section class="paper">
@@ -35,26 +41,49 @@
         <span class="paper-ico">◎</span>
         <div>
           <div class="paper-box-title">本資料の目的</div>
-          <div class="paper-box-sub">「気づき」を得るためのチェックです</div>
+          <div class="paper-box-sub">ITの知識や正解を問うテストではありません</div>
         </div>
       </div>
-      <p class="paper-text">
-        ご自身の事務所のIT運用・情報管理における「気づき」を得るためのツールです。<br>
-        潜在的なリスクを早期に発見し、対策を検討するきっかけとしてご活用ください。
-      </p>
+      <ul class="paper-list">
+        <li>本資料は、ITの知識や正解を問うテストではありません。</li>
+        <li>ご自身の事務所の「現在の状態」を整理・可視化するためのチェックです。</li>
+        <li>完璧に答える必要はありません。</li>
+      </ul>
     </div>
 
     <div class="paper-box">
       <div class="paper-box-head">
         <span class="paper-ico">✓</span>
         <div>
-          <div class="paper-box-title">正解を答える必要はありません</div>
-          <div class="paper-box-sub">完璧な回答を目指す必要はありません</div>
+          <div class="paper-box-title">ITトラブルは「技術」より「運用」で起きています</div>
+          <div class="paper-box-sub">原因は“日常の不明確さ”であることがほとんどです</div>
         </div>
       </div>
-      <p class="paper-text">
-        これはテストではありません。事務所の現状を整理するためのツールです。<br>
-        直感で回答いただいて構いません。
+      <div class="paper-text">
+        ITトラブルの多くは、次のような理由から起こります。<br>
+        ・高度な技術が足りないからではありません。<br>
+        ・最新ツールを使っていないからでもありません。<br><br>
+        実際の原因は、<br>
+        ・運用ルールが曖昧<br>
+        ・誰が判断するか決まっていない<br>
+        といった、日常的な運用の不明確さであることがほとんどです。
+      </div>
+    </div>
+    
+    <div class="paper-box">
+      <div class="paper-box-head">
+        <span class="paper-ico">！</span>
+        <div>
+          <div class="paper-box-title">「分からない」は重要な回答です</div>
+          <div class="paper-box-sub">不明確さ自体が、リスクに気づくサイン</div>
+        </div>
+      </div>
+      <ul class="paper-list">
+        <li>「誰が担当しているか分からない」</li>
+        <li>「ルールがあるか分からない」</li>
+      </ul>
+      <p class="paper-text" style="margin-top: 10px;">
+        ※こうした状態そのものが、リスクに気づくための大切なサインです。
       </p>
     </div>
 
@@ -63,37 +92,24 @@
         <span class="paper-ico">≡</span>
         <div>
           <div class="paper-box-title">チェックの使い方</div>
-          <div class="paper-box-sub">「はい／いいえ／わからない」で回答</div>
+          <div class="paper-box-sub">「誰が」「何を」「どのように」を整理します</div>
         </div>
       </div>
-      <ol class="paper-list">
-        <li>各設問に「はい／いいえ／わからない」で回答します。</li>
-        <li>結果画面で、分野別サマリと確認項目一覧が表示されます。</li>
-      </ol>
+      <ul class="paper-list">
+        <li>本チェックは、ITシステムの技術的な優劣を測るものではありません。</li>
+        <li>事務所内で「誰が」「何を」「どのように」管理・判断しているかを整理するためのものです。</li>
+        <li>現状を把握することで、より安全な事務所運営に向けた一歩を踏み出すことを目的としています。</li>
+      </ul>
     </div>
 
-    <div class="paper-box">
-      <div class="paper-box-head">
-        <span class="paper-ico">？</span>
-        <div>
-          <div class="paper-box-title">「わからない」も重要な判断材料です</div>
-          <div class="paper-box-sub">不明確さ自体がリスクのサイン</div>
-        </div>
-      </div>
-      <p class="paper-text">
-        「誰が担当しているか分からない」「ルールがあるか分からない」といった回答は、
-        それ自体が重要な気づきです。<br>
-        不明確な点を認識することが、リスク管理の第一歩になります。
-      </p>
-    </div>
   </div>
 
   <div class="paper-cta">
     <form method="post" action="{{ url_for('start') }}">
       <button class="btn primary btn-hero" type="submit">診断を開始する</button>
     </form>
-    <div class="paper-cta-note">※途中で中断しても、ブラウザを閉じない限り回答は保持されます（端末内）。</div>
   </div>
 </section>
+
 
 {% endblock %}

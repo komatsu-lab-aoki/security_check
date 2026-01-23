@@ -912,3 +912,7 @@ body{
   text-decoration: underline;
 }
 
+.paper-cta {
+  display: flex;
+  justify-content: flex-end;
+}

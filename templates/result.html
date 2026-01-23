@@ -22,109 +22,15 @@
 </section>
 
 
-{# ===== 相談CTA（総評の直後） ===== #}
-<section class="plain-block cta-block">
-  <div class="plain-head">
-    <h2 class="plain-title">次の一手（相談のご案内）</h2>
-  </div>
-
-  <p class="overall-lead cta-lead">
-    この結果で「優先順位の付け方が分からない」「どこから手を付けるべきか迷う」場合は、<br>
-    現状を整理し、無理のない改善手順（まず何を・どこまで）をご提案できます。
-  </p>
-
-  <div class="card cta-card">
-    <div class="section-title">PDFを添付して相談できます</div>
-
-    {% if not is_pdf %}
-      <ol class="cta-steps">
-        <li>「PDFをダウンロード」をクリック</li>
-        <li>お問い合わせフォームにアクセス</li>
-        <li>PDFを添付して送信</li>
-      </ol>
-
-      <div class="cta-actions">
-        <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
-        <a class="btn primary" href="https://aokishoji.com/contact" target="_blank" rel="noopener">
-          お問い合わせ
-        </a>
-      </div>
-
-      <div class="cta-template">
-        <div class="cta-template-title">お問い合わせに添える一文（例）</div>
-        <div class="cta-template-body">
-自己診断PDFを添付します。指摘が出た項目について、優先順位と改善手順の相談を希望します。
-現状は（例：職員は◯名／端末は◯台／在宅勤務あり）です。
-        </div>
-        <div class="note cta-template-note note-left">※上記はそのままコピペOKです。必要に応じて括弧内だけ埋めてください。</div>
-      </div>
-    {% else %}
-      <p class="note" style="margin-top:8px;">
-        このPDFを添付してご相談ください：<br>
-        https://aokishoji.com/contact
-      </p>
-    {% endif %}
-  </div>
-</section>
-
-{# ===== サマリ（分野別） ===== #}
-<div class="card">
-  <div class="section-title">サマリ（分野別）</div>
-  <p class="note note-left">高：優先して整理したい、中：状況確認・ルール化、低：余裕がある時に整備</p>
-  <p class="note note-left">※「指摘」は（いいえ／不明）など結果表示対象になった件数です。</p>
-
-  <div class="table-wrap">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th class="col-area" rowspan="2">分野</th>
-          <th class="col-total" rowspan="2">全件</th>
-          <th class="col-group" colspan="3">回答内訳</th>
-          <th class="col-group" colspan="3">指摘（リスク別）</th>
-        </tr>
-        <tr>
-          <th class="col-num">はい</th>
-          <th class="col-num">いいえ</th>
-          <th class="col-num">不明</th>
-          <th class="col-num high">高</th>
-          <th class="col-num medium">中</th>
-          <th class="col-num low">低</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for s in section_summary %}
-        <tr>
-          <td class="area">
-            <div class="area-title">{{ s.title }}</div>
-          </td>
-
-          <td class="num total">{{ s.total }}</td>
-
-          <td class="num">{{ s.answers.yes }}</td>
-          <td class="num">{{ s.answers.no }}</td>
-          <td class="num">{{ s.answers.unknown }}</td>
-
-          <td class="num high">{{ s.hit_by_risk.high }}</td>
-          <td class="num medium">{{ s.hit_by_risk.medium }}</td>
-          <td class="num low">{{ s.hit_by_risk.low }}</td>
-
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
 <section class="plain-block list-head">
   <div class="plain-head">
-    <h2 class="plain-title">確認項目一覧（分野別）</h2>
+    <h2 class="plain-title">回答結果／改善例</h2>
   </div>
 </section>
 
 {% for sec in sections %}
   {# PDF時は open を付けて強制展開 #}
-  <details class="genre" {% if is_pdf %}open{% endif %}>
+  <details class="genre" {% if is_pdf or loop.first %}open{% endif %}>
     <summary class="genre-summary">
       <div class="genre-left">
         <span class="genre-title">{{ sec.title }}</span>
@@ -187,17 +93,27 @@
 {% endfor %}
 
 
-{# ===== 相談CTA（ページ下部） ===== #}
-<section class="plain-block cta-block cta-block-bottom">
+
+{# ===== 相談CTA（総評の直後） ===== #}
+<section class="plain-block cta-block">
   <div class="plain-head">
-    <h2 class="plain-title">相談をご希望の方へ</h2>
+    <h2 class="plain-title">相談のご案内</h2>
   </div>
 
+  <p class="overall-lead cta-lead">
+    この結果で「優先順位の付け方が分からない」「どこから手を付けるべきか迷う」場合は、<br>
+    現状を整理し、無理のない改善手順（まず何を・どこまで）をご提案できます。
+  </p>
+
   <div class="card cta-card">
+    <div class="section-title">PDFを添付して相談できます</div>
+
     {% if not is_pdf %}
-      <p class="note note-left" style="margin-top:0;">
-        結果を踏まえて、現状に合った「優先順位」「最低限のルール化」「具体的な設定・運用」まで整理できます。
-      </p>
+      <ol class="cta-steps">
+        <li>「PDFをダウンロード」をクリック</li>
+        <li>お問い合わせフォームにアクセス</li>
+        <li>PDFを添付して送信</li>
+      </ol>
 
       <div class="cta-actions">
         <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
@@ -205,8 +121,17 @@
           お問い合わせ
         </a>
       </div>
+
+      <div class="cta-template">
+        <div class="cta-template-title">お問い合わせに添える一文（例）</div>
+        <div class="cta-template-body">
+自己診断PDFを添付します。指摘が出た項目について、優先順位と改善手順の相談を希望します。
+現状は（例：職員は◯名／端末は◯台／在宅勤務あり）です。
+        </div>
+        <div class="note cta-template-note note-left">※上記はそのままコピペOKです。必要に応じて括弧内だけ埋めてください。</div>
+      </div>
     {% else %}
-      <p class="note" style="margin-top:0;">
+      <p class="note" style="margin-top:8px;">
         このPDFを添付してご相談ください：<br>
         https://aokishoji.com/contact
       </p>
@@ -214,9 +139,61 @@
   </div>
 </section>
 
+{#
+===== サマリ（分野別） =====
+<div class="card">
+  <div class="section-title">サマリ（分野別）</div>
+  <p class="note note-left">高：優先して整理したい、中：状況確認・ルール化、低：余裕がある時に整備</p>
+  <p class="note note-left">※「指摘」は（いいえ／不明）など結果表示対象になった件数です。</p>
+
+  <div class="table-wrap">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th class="col-area" rowspan="2">分野</th>
+          <th class="col-total" rowspan="2">全件</th>
+          <th class="col-group" colspan="3">回答内訳</th>
+          <th class="col-group" colspan="3">指摘（リスク別）</th>
+        </tr>
+        <tr>
+          <th class="col-num">はい</th>
+          <th class="col-num">いいえ</th>
+          <th class="col-num">不明</th>
+          <th class="col-num high">高</th>
+          <th class="col-num medium">中</th>
+          <th class="col-num low">低</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for s in section_summary %}
+        <tr>
+          <td class="area">
+            <div class="area-title">{{ s.title }}</div>
+          </td>
+
+          <td class="num total">{{ s.total }}</td>
+
+          <td class="num">{{ s.answers.yes }}</td>
+          <td class="num">{{ s.answers.no }}</td>
+          <td class="num">{{ s.answers.unknown }}</td>
+
+          <td class="num high">{{ s.hit_by_risk.high }}</td>
+          <td class="num medium">{{ s.hit_by_risk.medium }}</td>
+          <td class="num low">{{ s.hit_by_risk.low }}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+#}
+
 <div class="page-note">
   <p>※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。</p>
-  <p>※回答内容は弊社のサーバに保存しません。「PDFをダウンロード」からデータの保存をおすすめいたします。</p>
+  <p>※※ご回答内容は外部へ送信・保存されることはありません。<br>
+    「PDFをダウンロード」からデータの保存をおすすめいたします。</p>
 </div>
 
 {% endblock %}

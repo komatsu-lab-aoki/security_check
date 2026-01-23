@@ -184,12 +184,14 @@ def build_rows_by_section(answers: dict, section_summary_by_id: dict) -> list[di
 
 def build_result_context(is_pdf: bool = False) -> dict:
     answers = session.get("answers", {}) or {}
-
-    # 結果表示対象（no/unknown）の件数をリスク別に集計
+    # 結果表示対象（no / unknown / 未回答）の件数をリスク別に集計
     counts = {"high": 0, "medium": 0, "low": 0}
+
     for _, item in iter_items():
         ans = answers.get(item["id"])
-        if ans in ("no", "unknown"):
+
+        # 未回答(None)も unknown と同じ扱い
+        if ans in ("no", "unknown") or ans is None:
             risk = item.get("risk", "medium")
             if risk not in counts:
                 risk = "medium"
