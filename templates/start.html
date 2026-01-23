@@ -25,7 +25,7 @@
     <span class="dot">•</span>
     <span>全{{ total_sections }}カテゴリ</span>
     <span class="dot">•</span>
-    <span>回答：はい／いいえ／不明</span>
+    <span>回答：はい／いいえ／わからない</span>
   </div>
 
   {# ▼ すぐ開始したい人向け（ファーストCTA） #}
@@ -33,27 +33,18 @@
     <form method="post" action="{{ url_for('start') }}">
       <button class="btn primary btn-hero" type="submit">診断を開始する（無料）</button>
     </form>
-    <div class="hero-cta-note" style="margin-top: 8px;">
-      <small>
-        ※回答内容は外部へ送信・保存されません（端末内で完結します）
-      </small>
-    </div>
   </div>
 </header>
 
 <div class="page-note">
   <p>
-    ※本診断は、監査・是正指示・評価を目的としたものではありません。<br>
-    弁護士事務所におけるIT・情報管理の現状を整理し、対応の優先順位を把握するためのセルフチェックです。
-  </p>
-  <p>
     ※ご回答内容は外部へ送信・保存されることはありません。<br>
-    守秘義務や依頼者情報に影響することなく、安心してご利用いただけます。
+  　守秘義務や依頼者情報に影響することなく、安心してご利用いただけます。
   </p>
 
   {# ▼ 指名＆信頼（運営者明示） #}
   <p style="margin-top: 10px;">
-    提供：<strong>株式会社青木商事</strong>（弁護士事務所向け IT顧問・改善支援）
+    提供：<strong>株式会社青木商事</strong>（弁護士事務所向けIT顧問サービス）
   </p>
 </div>
 
@@ -137,9 +128,6 @@
     <form method="post" action="{{ url_for('start') }}">
       <button class="btn primary btn-hero" type="submit">診断を開始する（無料）</button>
     </form>
-    <p style="margin-top: 10px; opacity: .85;">
-      <small>※回答は端末内で完結します。外部送信・保存は行いません。</small>
-    </p>
   </div>
 </section>
 
