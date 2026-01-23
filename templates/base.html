@@ -4,47 +4,62 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ITリスク自己診断</title>
+
+  {# ▼ 各ページで上書きできる title #}
+  <title>{% block title %}弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事{% endblock %}</title>
+
+  {# ▼ description もページ別に変えられるように #}
+  {% block meta_description %}
+  <meta name="description" content="弁護士事務所向けのITリスク・セキュリティ自己診断。端末・データ・ネットワーク・職員ルールまで、5〜15分で事務所のIT運用リスクを整理・可視化します。回答内容は外部送信・保存されません。提供：株式会社青木商事。">
+  {% endblock %}
+
+  {# ▼ canonical（重複評価を避ける） #}
+  <link rel="canonical" href="{{ request.url }}">
+
+  {# ▼ SNS共有の見栄え（OGP） #}
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:title" content="{% block og_title %}弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}端末・データ・ネットワーク・職員ルールまで、事務所のIT運用を体系的に整理するセルフチェック。回答は外部送信・保存されません。{% endblock %}">
+  <meta property="og:url" content="{{ request.url }}">
+  {# og:image を用意できるなら差し替え推奨（なければコメントアウトのままでOK） #}
+  {# <meta property="og:image" content="https://security.aokishoji.com/static/ogp.png"> #}
+
+  {# ▼ Twitterカード（X） #}
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
   <!-- 明朝（士業感）を見出しだけに使う -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <div class="container">
     <div class="header">
-      <div class="brand">ITリスク自己診断</div>
-
-      <div class="header-right">
-        <a href="https://aokishoji.com/"
-          target="_blank"
-          rel="noopener"
-          class="header-link">
-          トップ
-        </a>
-
-        <a href="https://aokishoji.com/lawoffice"
-          target="_blank"
-          rel="noopener"
-          class="header-link">
-          弁護士事務所IT顧問
-        </a>
-
-        <a href="https://aokishoji.com/contact"
-          target="_blank"
-          rel="noopener"
-          class="header-link">
-          お問い合わせ
+      <div class="brand">
+        <a href="{{ url_for('start_page') if 'start_page' in globals() else '/' }}" style="color: inherit; text-decoration: none;">
+          ITリスク自己診断
         </a>
       </div>
-    </div>
 
+      <div class="header-right">
+        <a href="https://aokishoji.com/" target="_blank" rel="noopener" class="header-link">トップ</a>
+        <a href="https://aokishoji.com/lawoffice" target="_blank" rel="noopener" class="header-link">弁護士事務所IT顧問</a>
+        <a href="https://aokishoji.com/contact" target="_blank" rel="noopener" class="header-link">お問い合わせ</a>
+      </div>
+    </div>
 
     {% block content %}{% endblock %}
 
     <div class="hr"></div>
-    <div class="note">Copyright 2026 Aokishoji Co., Ltd.</div>
+    <div class="note">
+      Copyright 2026 Aokishoji Co., Ltd.
+      <span style="margin: 0 6px;">/</span>
+      提供：株式会社青木商事
+    </div>
   </div>
 </body>
 </html>

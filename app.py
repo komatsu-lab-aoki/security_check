@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, make_response, send_from_directory
 from playwright.sync_api import sync_playwright
 
 from questions import (
@@ -15,9 +15,17 @@ from questions import (
     validate_questions,
 )
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 app.secret_key = "change-me"  # 本番は環境変数へ
 
+
+@app.get("/robots.txt")
+def robots_txt():
+    return send_from_directory(app.static_folder, "robots.txt", mimetype="text/plain")
+
+@app.get("/sitemap.xml")
+def sitemap_xml():
+    return send_from_directory(app.static_folder, "sitemap.xml", mimetype="application/xml")
 
 # --------------------------
 # 集計・結果生成
