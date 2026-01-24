@@ -1,3 +1,4 @@
 su aoki
 
+cd /apl/aoki/security_check
 ./deploy.sh

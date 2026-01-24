@@ -935,3 +935,121 @@ body{
   line-height: 1.5;
   opacity: 0.85;
 }
+/* --- simple start page --- */
+.hero--simple { padding-bottom: 8px; }
+.hero-title--tight { line-height: 1.2; }
+.hero-lead--tight { margin-top: 10px; max-width: 52em; }
+.hero-note--tight { margin-top: 10px; font-size: 0.85rem; opacity: 0.85; }
+
+.hero-meta--wrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 10px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* 日本語の途中で割れて “ITリス / ク” みたいになるのを防ぐ */
+.hero-title, .hero-lead, .hero-meta {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* パンくずはPCだけでOK（スマホは消してスッキリ） */
+@media (max-width: 768px){
+  .breadcrumb--optional{ display:none; }
+}
+
+/* details（折りたたみ） */
+.intro--compact { margin-top: 14px; }
+.intro-details{
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+.intro-details > summary{
+  cursor: pointer;
+  padding: 14px 14px;
+  font-weight: 700;
+  list-style: none;
+}
+.intro-details > summary::-webkit-details-marker{ display:none; }
+.intro-details > summary::after{
+  content:"▼";
+  float:right;
+  opacity:.6;
+}
+.intro-details[open] > summary::after{ content:"▲"; }
+
+.intro-details-body{ padding: 0 14px 14px 14px; }
+.intro-details-body p{ margin: 12px 0; }
+.intro-details-body ul{ margin: 10px 0 0 0; padding-left: 1.1em; }
+
+.intro-provider{
+  margin-top: 10px;
+  font-size: 0.85rem;
+  opacity: .85;
+}
+
+/* 下CTAは中央寄せ（スマホで“右寄せ”は不安定に見える） */
+.bottom-cta{
+  margin-top: 18px;
+  display:flex;
+  justify-content:center;
+}
+@media (max-width: 768px){
+  .bottom-cta .btn-hero{ width:100%; }
+}
+.header-logo img {
+  height: 36px;          /* PC基準。大きければ 40px でもOK */
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .header-logo img {
+    height: 28px;        /* スマホでは少し小さく */
+  }
+}
+.hero-meta--wrap {
+  display: flex;
+  flex-direction: column;   /* ← 縦並び */
+  gap: 6px;                 /* 行間（好みで調整） */
+  margin-top: 12px;
+}
+
+/* 区切りの「・」は縦並びでは不要なので消す */
+.hero-meta--wrap .dot {
+  display: none;
+}
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .hero-meta--wrap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-meta--wrap .dot {
+    display: none;
+  }
+}
+.hero-meta--wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+
+  align-items: flex-start; /* 左寄せ */
+  text-align: left;        /* 左寄せ */
+}
+.btn-hero {
+  margin-top: 20px; /* ← ここで余白を作る */
+}
