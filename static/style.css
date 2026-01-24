@@ -916,3 +916,22 @@ body{
   display: flex;
   justify-content: flex-end;
 }
+
+.hero-title,
+.hero-lead,
+.hero-meta {
+  word-break: keep-all;      /* 日本語を途中で割らない */
+  overflow-wrap: break-word;
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 0.9rem;
+}
+.hero-note,
+.trustline {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}

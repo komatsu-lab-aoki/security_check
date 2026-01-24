@@ -4,58 +4,62 @@
 
 {% block content %}
 
-<div class="breadcrumb">
-  <a href="/">トップ</a>
-  <span>›</span>
+{# パンくず：モバイルでは非表示推奨（CSSで制御） #}
+<nav class="breadcrumb" aria-label="パンくず">
+  <a href="/check">トップ</a>
+  <span aria-hidden="true">›</span>
   <span>ITリスク自己診断</span>
-</div>
+</nav>
 
-<header class="hero">
-  {# ▼ SEO/主題の明確化：H1を追加 #}
-  <h1 class="hero-title">弁護士事務所向け ITリスク・セキュリティ自己診断</h1>
+<header class="hero" role="banner">
+  {# SEOの要：H1は残す（表示はシンプル） #}
+  <h1 class="hero-title">
+    弁護士事務所向け<br>
+    ITリスク・セキュリティ自己診断
+  </h1>
 
-  {# ▼ クリック/納得感を上げる短い導入 #}
-  <p class="hero-lead">
-    端末・データ・ネットワーク・職員ルールまで、事務所のIT運用を体系的に整理するセルフチェックです。<br>
-    「技術の良し悪し」ではなく、<strong>運用の不明確さ（誰が判断するか／何が決まっているか）</strong>を見える化します。
+
+
+  {# リードは短く（モバイルでの“読む前に疲れる”を防ぐ） #}
+  <p class="hero-lead hero-lead--short">
+    事務所のIT運用リスクを整理・可視化するセルフチェックです。
   </p>
 
   <div class="hero-meta">
     <span>所要時間：10〜15分</span>
     <span class="dot">•</span>
-    <span>全{{ total_sections }}カテゴリ</span>
+    <span>全5カテゴリ</span>
     <span class="dot">•</span>
     <span>回答：はい／いいえ／わからない</span>
   </div>
 
-  {# ▼ すぐ開始したい人向け（ファーストCTA） #}
-  <div class="hero-cta" style="margin-top: 14px;">
+
+  <div class="hero-cta">
     <form method="post" action="{{ url_for('start') }}">
       <button class="btn primary btn-hero" type="submit">診断を開始する（無料）</button>
     </form>
+    <p class="hero-note">
+      ※回答内容は外部へ送信・保存されません（端末内で完結）
+    </p>
   </div>
 </header>
 
-<div class="page-note">
+{# 信頼要素：一言に圧縮（モバイルで長くしない） #}
+<section class="trustline" aria-label="提供者情報">
   <p>
-    ※ご回答内容は外部へ送信・保存されることはありません。<br>
-  　守秘義務や依頼者情報に影響することなく、安心してご利用いただけます。
+    提供：<strong>株式会社青木商事</strong>（弁護士事務所向けIT顧問・改善支援）
   </p>
+</section>
 
-  {# ▼ 指名＆信頼（運営者明示） #}
-  <p style="margin-top: 10px;">
-    提供：<strong>株式会社青木商事</strong>（弁護士事務所向けIT顧問サービス）
-  </p>
-</div>
-
-<section class="paper">
+{# ---- はじめに（PC：カード / スマホ：アコーディオン） ---- #}
+<section class="paper" aria-label="はじめに">
   <div class="paper-head">
     <h2 class="paper-title">はじめに</h2>
     <div class="paper-rule"></div>
   </div>
 
-  <div class="paper-grid">
-
+  {# PC向け：従来のカード（※モバイルで非表示にする） #}
+  <div class="intro-grid intro-grid--desktop" aria-label="診断の説明（PC表示）">
     <div class="paper-box">
       <div class="paper-box-head">
         <span class="paper-ico">◎</span>
@@ -65,8 +69,7 @@
         </div>
       </div>
       <ul class="paper-list">
-        <li>本診断は、ITの知識や正解を問うテストではありません。</li>
-        <li>ご自身の事務所の「現在の状態」を整理・可視化するためのチェックです。</li>
+        <li>事務所の「現在の状態」を整理・可視化するためのチェックです。</li>
         <li>完璧に答える必要はありません（不明は重要な回答です）。</li>
       </ul>
     </div>
@@ -76,17 +79,12 @@
         <span class="paper-ico">✓</span>
         <div>
           <div class="paper-box-title">ITトラブルは「技術」より「運用」で起きます</div>
-          <div class="paper-box-sub">“日常の不明確さ”が、事故の入口になることが多い</div>
+          <div class="paper-box-sub">“日常の不明確さ”が事故の入口になりやすい</div>
         </div>
       </div>
       <div class="paper-text">
-        ITトラブルの多くは、次のような理由から起こります。<br>
-        ・高度な技術が足りないからではありません。<br>
-        ・最新ツールを使っていないからでもありません。<br><br>
-        実際の原因は、<br>
-        ・運用ルールが曖昧<br>
-        ・誰が判断するか決まっていない<br>
-        といった、日常的な運用の不明確さであることがほとんどです。
+        原因は「高度な技術不足」ではなく、<br>
+        <strong>運用ルールの曖昧さ／判断者が決まっていない</strong>ことが多いです。
       </div>
     </div>
 
@@ -95,16 +93,13 @@
         <span class="paper-ico">！</span>
         <div>
           <div class="paper-box-title">「分からない」は重要な回答です</div>
-          <div class="paper-box-sub">不明確さ自体が、リスクに気づくサイン</div>
+          <div class="paper-box-sub">不明確さ自体が、整備すべきサイン</div>
         </div>
       </div>
       <ul class="paper-list">
         <li>「誰が担当しているか分からない」</li>
         <li>「ルールがあるか分からない」</li>
       </ul>
-      <p class="paper-text" style="margin-top: 10px;">
-        ※こうした状態そのものが、優先して整理すべきポイントです。
-      </p>
     </div>
 
     <div class="paper-box">
@@ -116,12 +111,47 @@
         </div>
       </div>
       <ul class="paper-list">
-        <li>本チェックは、ITシステムの技術的な優劣を測るものではありません。</li>
-        <li>事務所内で「誰が」「何を」「どのように」管理・判断しているかを整理するためのものです。</li>
-        <li>現状を把握することで、より安全な事務所運営に向けた一歩を踏み出すことを目的としています。</li>
+        <li>技術の優劣ではなく、運用の“決まりごと”を整理します。</li>
+      </ul>
+    </div>
+  </div>
+
+  {# スマホ向け：要点 + アコーディオン（※PCで非表示にする） #}
+  <div class="intro-grid intro-grid--mobile" aria-label="診断の説明（スマホ表示）">
+    <div class="intro-quick">
+      <p class="intro-quick-lead">
+        事故の多くは「運用の不明確さ」から起きます。まずは現状を整理しましょう。
+      </p>
+      <ul class="intro-quick-list">
+        <li>評価や監査ではなく「現状整理」です</li>
+        <li>「わからない」は、優先して整えるべきサインです</li>
       </ul>
     </div>
 
+    <details class="intro-details">
+      <summary>診断の考え方・使い方を見る</summary>
+      <div class="intro-details-body">
+        <h3>この診断の目的</h3>
+        <ul>
+          <li>事務所のIT運用を整理・可視化するためのチェックです。</li>
+          <li>完璧に答える必要はありません（不明は重要な回答です）。</li>
+        </ul>
+
+        <h3>ITトラブルは「技術」より「運用」</h3>
+        <p>
+          原因は高度な技術不足ではなく、運用ルールの曖昧さや判断者が決まっていないことが多いです。
+        </p>
+
+        <h3>「分からない」は重要</h3>
+        <ul>
+          <li>誰が担当か分からない</li>
+          <li>ルールがあるか分からない</li>
+        </ul>
+
+        <h3>チェックの使い方</h3>
+        <p>「誰が」「何を」「どのように」を整理し、優先順位をつけるために使います。</p>
+      </div>
+    </details>
   </div>
 
   <div class="paper-cta">
