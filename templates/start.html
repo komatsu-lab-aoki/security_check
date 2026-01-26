@@ -1,10 +1,14 @@
 {# templates/start.html #}
 {% extends "base.html" %}
-{% block title %}弁護士事務所向け ITリスク・セキュリティ自己診断（無料） | 青木商事{% endblock %}
+
+{% block title %}弁護士事務所のIT・情報セキュリティ無料自己診断｜10分セルフチェック｜青木商事{% endblock %}
+
+{% block description %}
+弁護士事務所向けのIT・情報セキュリティ自己診断（無料）。端末管理・データ保護・ネットワーク・職員ルールを10〜15分で整理・可視化。回答内容は外部送信・保存されません。
+{% endblock %}
 
 {% block content %}
 
-{# パンくず：SEO上なくてもOK。必要ならPCのみ表示（CSSで） #}
 <nav class="breadcrumb breadcrumb--optional" aria-label="パンくず">
   <a href="/check">トップ</a>
   <span aria-hidden="true">›</span>
@@ -16,6 +20,11 @@
 
   <p class="hero-lead hero-lead--tight">
     事務所のIT運用リスクを整理・可視化するセルフチェックです。
+  </p>
+
+  {# 任意：SEO＆安心感を少しだけ増やす #}
+  <p class="hero-note hero-note--tight">
+    想定する主なリスク：情報漏洩／端末・アカウント管理／クラウド運用／職員ルールの未整備 など
   </p>
 
   <div class="hero-meta hero-meta--wrap">

@@ -1,5 +1,6 @@
 {# templates/result.html（弁護士向け・読みやすい版） #}
 {% extends "base.html" %}
+{% block robots %}noindex, nofollow{% endblock %}
 {% block content %}
 
 <div class="breadcrumb">
@@ -21,6 +22,25 @@
   <p class="overall-lead">{{ overall.message }}<br>{{ overall.lead }}</p>
 </section>
 
+{# ===== 専門家に依頼したほうが良いケース ===== #}
+{% if assist_hits and assist_hits|length > 0 %}
+<section class="plain-block">
+  <div class="plain-head">
+    <h2 class="plain-title">専門家に依頼したほうが良いケース</h2>
+  </div>
+
+  <p class="overall-lead">
+    今回の結果では、次の点が該当しました。<br>
+    これらは <strong>「自分だけで整理するのが難しくなりやすいサイン」</strong>です。
+  </p>
+
+  <ul class="list">
+    {% for hit in assist_hits %}
+      <li><strong>{{ hit }}</strong></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
 
 <section class="plain-block list-head">
   <div class="plain-head">
@@ -92,40 +112,58 @@
   </details>
 {% endfor %}
 
+{# ===== 依頼の判断基準（CTA直前） ===== #}
+<section class="plain-block" style="margin-top: 16px;">
+  <div class="card">
+    <div class="section-title">専門家による整理・支援を検討したほうがよいケース</div>
+    <p class="note note-left" style="margin-top:8px;">
+      次に当てはまる場合、個別に優先順位を整理し、無理のない改善手順（まず何を・どこまで）を決めることをおすすめします。
+    </p>
+    <ul class="list">
+      <li>高リスクの項目が多い（例：3件以上）</li>
+      <li>「わからない」が多い（運用が把握できていない）</li>
+      <li>端末管理／アカウント管理／バックアップ／ネットワークのいずれかが未整備</li>
+      <li>職員が複数名いて、ルールが口頭運用になっている</li>
+    </ul>
+    <p class="note note-left" style="margin-top:10px;">
+      ※該当しても「すぐ契約」ではなく、まずは状況整理と優先順位付けだけでも可能です。
+    </p>
+  </div>
+</section>
 
-
-{# ===== 相談CTA（総評の直後） ===== #}
+{# ===== 相談CTA（下部） ===== #}
 <section class="plain-block cta-block">
   <div class="plain-head">
     <h2 class="plain-title">相談のご案内</h2>
   </div>
 
   <p class="overall-lead cta-lead">
-    この結果で「優先順位の付け方が分からない」「どこから手を付けるべきか迷う」場合は、<br>
-    現状を整理し、無理のない改善手順（まず何を・どこまで）をご提案できます。
+    ご相談では、診断結果（PDF）をもとに<br>
+    「優先順位」と「まず何を・どこまで整備すべきか」を整理します。<br>
+    実際の設定作業を行わなくても、事務所内で判断・対応できる状態をつくることを目的としています。
   </p>
 
   <div class="card cta-card">
-    <div class="section-title">PDFを添付して相談できます</div>
+    <div class="section-title">診断結果をもとに、優先順位を一緒に整理できます</div>
 
     {% if not is_pdf %}
       <ol class="cta-steps">
         <li>「PDFをダウンロード」をクリック</li>
-        <li>お問い合わせフォームにアクセス</li>
-        <li>PDFを添付して送信</li>
+        <li>「優先順位を整理してもらう（相談）」をクリック</li>
+        <li>可能であれば、診断結果（PDF）を添付して送信</li>
       </ol>
 
       <div class="cta-actions">
         <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
         <a class="btn primary" href="https://aokishoji.com/contact" target="_blank" rel="noopener">
-          お問い合わせ
+          優先順位を整理してもらう（相談）
         </a>
       </div>
 
       <div class="cta-template">
         <div class="cta-template-title">お問い合わせに添える一文（例）</div>
         <div class="cta-template-body">
-自己診断PDFを添付します。指摘が出た項目について、優先順位と改善手順の相談を希望します。
+自己診断PDFを添付します。指摘が出た項目について、優先順位と改善手順の整理を相談したいです。
 現状は（例：職員は◯名／端末は◯台／在宅勤務あり）です。
         </div>
         <div class="note cta-template-note note-left">※上記はそのままコピペOKです。必要に応じて括弧内だけ埋めてください。</div>
@@ -139,56 +177,38 @@
   </div>
 </section>
 
-{#
-===== サマリ（分野別） =====
-<div class="card">
-  <div class="section-title">サマリ（分野別）</div>
-  <p class="note note-left">高：優先して整理したい、中：状況確認・ルール化、低：余裕がある時に整備</p>
-  <p class="note note-left">※「指摘」は（いいえ／不明）など結果表示対象になった件数です。</p>
+{# ===== note誘導（下部・理解を深めたい人向け） ===== #}
+<section class="plain-block">
+  <div class="card" style="background:#f7f7f4;">
+    <div class="section-title">診断結果をどう活かすか</div>
 
-  <div class="table-wrap">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th class="col-area" rowspan="2">分野</th>
-          <th class="col-total" rowspan="2">全件</th>
-          <th class="col-group" colspan="3">回答内訳</th>
-          <th class="col-group" colspan="3">指摘（リスク別）</th>
-        </tr>
-        <tr>
-          <th class="col-num">はい</th>
-          <th class="col-num">いいえ</th>
-          <th class="col-num">不明</th>
-          <th class="col-num high">高</th>
-          <th class="col-num medium">中</th>
-          <th class="col-num low">低</th>
-        </tr>
-      </thead>
+    <p class="note note-left" style="margin-top:8px;">
+      今回の診断結果を見て、
+      <br>
+      「すぐ相談するほどではないが、考え方は知っておきたい」
+      「他の弁護士事務所では、どう整理しているのか知りたい」
+      <br>
+      という方向けに、考え方を整理した記事を書いています。
+    </p>
 
-      <tbody>
-        {% for s in section_summary %}
-        <tr>
-          <td class="area">
-            <div class="area-title">{{ s.title }}</div>
-          </td>
+    <ul class="list" style="margin-top:8px;">
+      <li>IT事故が起きる本当の原因</li>
+      <li>弁護士事務所で優先すべきITリスク</li>
+      <li>「全部やらなくていい」判断の考え方</li>
+    </ul>
 
-          <td class="num total">{{ s.total }}</td>
+    <div class="cta-actions" style="margin-top:12px;">
+      <a class="btn" href="https://note.com/shoji325/n/na3d375d6b524" target="_blank" rel="noopener">
+        noteで詳しく読む（考え方編）
+      </a>
+    </div>
 
-          <td class="num">{{ s.answers.yes }}</td>
-          <td class="num">{{ s.answers.no }}</td>
-          <td class="num">{{ s.answers.unknown }}</td>
-
-          <td class="num high">{{ s.hit_by_risk.high }}</td>
-          <td class="num medium">{{ s.hit_by_risk.medium }}</td>
-          <td class="num low">{{ s.hit_by_risk.low }}</td>
-
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="note note-left" style="margin-top:10px;">
+      ※ 記事は少し長めです。時間があるときにお読みください。
+    </div>
   </div>
-</div>
-#}
+</section>
+
 
 <div class="page-note">
   <p>※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。</p>

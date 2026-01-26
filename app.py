@@ -192,13 +192,10 @@ def build_rows_by_section(answers: dict, section_summary_by_id: dict) -> list[di
 
 def build_result_context(is_pdf: bool = False) -> dict:
     answers = session.get("answers", {}) or {}
-    # 結果表示対象（no / unknown / 未回答）の件数をリスク別に集計
     counts = {"high": 0, "medium": 0, "low": 0}
 
     for _, item in iter_items():
         ans = answers.get(item["id"])
-
-        # 未回答(None)も unknown と同じ扱い
         if ans in ("no", "unknown") or ans is None:
             risk = item.get("risk", "medium")
             if risk not in counts:
@@ -208,7 +205,35 @@ def build_result_context(is_pdf: bool = False) -> dict:
     overall = overall_judgement(counts)
     section_summary, section_summary_by_id = build_section_summary(answers)
     sections = build_rows_by_section(answers, section_summary_by_id)
-    all_rows = build_rows_all(answers)  # 互換用（テンプレが参照してもOK）
+    all_rows = build_rows_all(answers)
+
+    # ▼▼▼ ここから追加 ▼▼▼
+    total_questions = len(all_rows)
+    unknown_total = sum(s["answers"]["unknown"] for s in section_summary)
+    unknown_rate = (unknown_total / total_questions) if total_questions else 0.0
+
+    assist_flags = {
+        "high_ge_3": counts["high"] >= 3,
+        "unknown_ge_30pct": unknown_rate >= 0.30,
+        # 例：主要3分野のどれかが未整備（指摘が1件でもあれば）
+        # ※ id はあなたの SECTIONS の id に合わせて調整してOK
+        "core_unready": any(
+            section_summary_by_id.get(sid, {}).get("hit_total", 0) > 0
+            for sid in ("device", "backup", "network")
+        ),
+        # 職員複数は入力がないので、とりあえずテンプレ側で文言だけ表示（任意）
+        "multi_staff_rule_oral": False,
+    }
+
+    assist_hits = []
+    if assist_flags["high_ge_3"]:
+        assist_hits.append("高リスクの項目が多い（例：3件以上）")
+    if assist_flags["unknown_ge_30pct"]:
+        assist_hits.append(f"「わからない」が多い（{unknown_total}/{total_questions}件：{unknown_rate:.0%}）")
+    if assist_flags["core_unready"]:
+        assist_hits.append("端末管理／バックアップ／ネットワークのいずれかが未整備")
+
+    # ▲▲▲ ここまで追加 ▲▲▲
 
     return {
         "overall": overall,
@@ -216,8 +241,16 @@ def build_result_context(is_pdf: bool = False) -> dict:
         "all_rows": all_rows,
         "section_summary": section_summary,
         "sections": sections,
-        "is_pdf": is_pdf,  # ✅ テンプレが open 判定に使う
+        "is_pdf": is_pdf,
+
+        # ▼ 追加でテンプレに渡す
+        "total_questions": total_questions,
+        "unknown_total": unknown_total,
+        "unknown_rate": unknown_rate,
+        "assist_flags": assist_flags,
+        "assist_hits": assist_hits,
     }
+
 
 
 # --------------------------
