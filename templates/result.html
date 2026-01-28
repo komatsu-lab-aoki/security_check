@@ -71,11 +71,16 @@
               <span class="item-no">{{ loop.index }}</span>
               <span>{{ r.question }}</span>
             </div>
-            <span class="badge {{ r.risk }}">{{ "リスク：" ~ r.risk_label }}</span>
+
+            {% if r.answer == "yes" %}
+              <span class="badge ok">OK</span>
+            {% else %}
+              <span class="badge {{ r.risk }}">{{ "リスク：" ~ r.risk_label }}</span>
+            {% endif %}
           </div>
 
           <div class="kv">
-            <div class="item"><span class="key">回答</span>{{ r.answer_label }}</div>
+            <div class="item"><span class="key">あなたの回答：</span>{{ r.answer_label }}</div>
           </div>
 
           {% if r.answer != "yes" %}

@@ -793,3 +793,10 @@ details.genre[open] .genre-arrow{ transform: rotate(180deg); }
     opacity: 1;
   }
 }
+
+.badge.ok {
+  background: #e6f4ea;
+  color: #1e7f43;
+  border: 1px solid #b7e1c3;
+  font-weight: 600;
+}
