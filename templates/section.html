@@ -1,4 +1,4 @@
-{# templates/section.html #}
+﻿{# templates/section.html #}
 {% extends "base.html" %}
 {% block title %}{{ sec.title }} | ITリスク自己診断{% endblock %}
 {% block robots %}noindex, nofollow{% endblock %}
@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="breadcrumb">
-  <a href="{{ url_for('start') }}">診断トップ</a>
+  <a href="{{ url_for('start_check') }}">トップ</a>
   <span>›</span>
   <span>{{ sec.title }}</span>
 </div>
@@ -18,56 +18,56 @@
       進捗：{{ progress.current }} / {{ progress.total }}
     </span>
   </div>
-
+  
   <div class="note" style="margin-top:8px;">
     ※ 回答画面では解説は表示しません（結果画面でまとめて確認できます）。
   </div>
-
-  <form method="post" action="{{ url_for('section', idx=idx) }}" style="margin-top:14px;">
+  
+  <form method="post" action="{{ url_for('check_section', idx=idx) }}" style="margin-top:14px;">
     <div class="q-list">
       {% for item in sec["items"] %}
-        <div class="q-item">
-          <div class="q-head">
-            <div class="q-no">Q{{ loop.index }}</div>
-            <div class="q-text">{{ item["q"] }}</div>
-          </div>
-
-          <div class="q-choices" role="radiogroup" aria-label="Q{{ loop.index }}">
-            {% set current = answers.get(item["id"]) %}
-            {% for c in choices %}
-              <label class="choice">
-                <input
-                  type="radio"
-                  name="{{ item['id'] }}"
-                  value="{{ c.value }}"
-                  {% if current == c.value %}checked{% endif %}
-                >
-                <span>{{ c.label }}</span>
-              </label>
-            {% endfor %}
-          </div>
+      <div class="q-item">
+        <div class="q-head">
+          <div class="q-no">Q{{ loop.index }}</div>
+          <div class="q-text">{{ item["q"] }}</div>
         </div>
+        
+        <div class="q-choices" role="radiogroup" aria-label="Q{{ loop.index }}">
+          {% set current = answers.get(item["id"]) %}
+          {% for c in choices %}
+          <label class="choice">
+            <input
+            type="radio"
+            name="{{ item['id'] }}"
+            value="{{ c.value }}"
+            {% if current == c.value %}checked{% endif %}
+            >
+            <span>{{ c.label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
       {% endfor %}
     </div>
-
+    
     <div class="actions">
       <div class="left">
         {% if idx > 0 %}
-          <button class="btn" type="submit" name="prev" value="1">前へ</button>
+        <button class="btn" type="submit" name="prev" value="1">前へ</button>
         {% else %}
-          <a class="btn link" href="{{ url_for('start') }}">診断トップへ</a>
+        <a class="btn link" href="{{ url_for('start_check') }}">診断トップへ</a>
         {% endif %}
       </div>
-
+      
       <div class="right">
         {% if idx < progress.total - 1 %}
-          <button class="btn primary" type="submit" name="next" value="1">次へ</button>
+        <button class="btn primary" type="submit" name="next" value="1">次へ</button>
         {% else %}
-          <button class="btn primary" type="submit">結果を見る</button>
+        <button class="btn primary" type="submit">結果を見る</button>
         {% endif %}
       </div>
     </div>
-
+    
   </form>
 </div>
 

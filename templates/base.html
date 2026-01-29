@@ -1,4 +1,4 @@
-{# templates/base.html #}
+﻿{# templates/base.html #}
 <!doctype html>
 <html lang="ja">
 <head>
@@ -6,32 +6,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- title -->
-  <title>
-    {% block title %}
-    弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事
-    {% endblock %}
-  </title>
+  <title>{% block title %}弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事{% endblock %}</title>
 
-  <!-- meta description（★ここを唯一の定義にする） -->
-  <meta name="description" content="
-    {% block description %}
-    弁護士事務所向けのITリスク・セキュリティ自己診断。
-    端末・データ・ネットワーク・職員ルールまで、
-    5〜15分で事務所のIT運用リスクを整理・可視化します。
-    {% endblock %}
-  ">
+  <!-- meta description（1行推奨） -->
+  <meta name="description" content="{% block description %}弁護士事務所向けのITリスク・セキュリティ自己診断。端末・データ・ネットワーク・職員ルールまで、5〜15分で事務所のIT運用リスクを整理・可視化します。{% endblock %}">
+
+  <!-- robots -->
+  {% if self.robots() %}
+    <meta name="robots" content="{{ self.robots() | striptags | trim }}">
+  {% else %}
+    <meta name="robots" content="index,follow">
+  {% endif %}
+
+  <!-- canonical（クエリを除外するなら base_url） -->
+  <link rel="canonical" href="{% block canonical %}https://security.aokishoji.com/lawyer-it-risk{% endblock %}">
   
-  <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
-
-  <!-- canonical -->
-  <link rel="canonical" href="{{ request.url }}">
-
   <!-- OGP -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
-  <meta property="og:title" content="{% block og_title %}弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}端末・データ・ネットワーク・職員ルールまで、事務所のIT運用を体系的に整理するセルフチェック。{% endblock %}">
-  <meta property="og:url" content="{{ request.url }}">
+
+  {# og:title は title と同じ値をデフォにする（ブロックの再定義はしない） #}
+  <meta property="og:title" content="{% block og_title %}{{ self.title() | striptags | trim }}{% endblock %}">
+
+  {# og:description は description と同じ値をデフォにする #}
+  <meta property="og:description" content="{% block og_description %}{{ self.description() | striptags | trim }}{% endblock %}">
+
+  {# og:url は canonical と同じ値をデフォにする #}
+  <meta property="og:url" content="{% block og_url %}{{ self.canonical() | striptags | trim }}{% endblock %}">
+
   <!-- <meta property="og:image" content="https://security.aokishoji.com/static/ogp.png"> -->
 
   <!-- Twitter -->
@@ -45,16 +47,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
-
 <body>
   <div class="container">
     <div class="header">
       <div class="brand">
-        <a href="/check" class="header-logo">
-          <img src="{{ url_for('static', filename='original.png') }}"
-              alt="弁護士事務所向け ITリスク・セキュリティ自己診断｜株式会社青木商事">
-        </a>
+        <a href="{{ url_for('start_lawyer_it_risk') }}" class="header-logo">
 
+          <img src="{{ url_for('static', filename='original.png') }}"
+               alt="弁護士事務所向け ITリスク・セキュリティ自己診断｜株式会社青木商事">
+        </a>
       </div>
 
       <div class="header-right">
@@ -63,8 +64,6 @@
         <a href="https://aokishoji.com/contact" target="_blank" rel="noopener" class="header-link">お問い合わせ</a>
       </div>
     </div>
-
-    
 
     {% block content %}{% endblock %}
 

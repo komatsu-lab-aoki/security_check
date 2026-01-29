@@ -1,0 +1,162 @@
+﻿{# templates/start_lawyer_it_risk.html #}
+{% extends "base.html" %}
+
+{% block title %}弁護士事務所向け ITリスク・セキュリティ自己診断｜無料・5〜10分｜青木商事{% endblock %}
+
+{% block description %}弁護士事務所のITリスク、うちは本当に大丈夫？端末管理・バックアップ・ネットワーク・職員ルールを5〜10分で整理できる無料セルフチェック。回答は外部送信なし。{% endblock %}
+
+{% block robots %}index,follow{% endblock %}
+
+{% block canonical %}https://security.aokishoji.com/lawyer-it-risk{% endblock %}
+
+{# og_url は base.html のデフォルト（canonicalと同じ）でOK #}
+
+{% block content %}
+
+<nav class="breadcrumb breadcrumb--optional" aria-label="パンくず">
+  <a href="/lawyer-it-risk">トップ</a>
+  <span aria-hidden="true">›</span>
+  <span>ITリスク自己診断</span>
+</nav>
+
+{# ✅ ヒーローと本文を“同じ左寄せカラム”に統一 #}
+<div class="page-narrow">
+
+  <header class="hero hero--simple">
+    <h1 class="hero-title serif">弁護士事務所向け<br>ITリスク・セキュリティ自己診断</h1>
+
+    <p class="hero-lead hero-lead--tight">
+      事務所のIT運用リスクを、短時間で「整理できる状態」にするセルフチェックです。
+    </p>
+
+    <div class="hero-card">
+      <p class="hero-meta hero-meta--tight">
+        無料｜外部送信なし｜所要時間 5〜10分<br>
+        回答形式：はい／いいえ／わからない（全{{ total_sections }}分野）
+      </p>
+      <p class="hero-assurance">
+        今すぐ対応すべきITリスクが分かります
+      </p>
+
+      <div class="hero-cta hero-cta--simple">
+        <form action="{{ url_for('start_check') }}" method="post">
+          <button class="btn primary btn-hero" type="submit">診断を開始する（無料）</button>
+        </form>
+
+        <p class="hero-note hero-note--tight">
+          ※回答内容は外部へ送信・保存されません（端末内で完結）
+        </p>
+      </div>
+    </div>
+  </header>
+
+
+  {# =========================
+     SEO/AIO 本文（STEP3骨組み）
+     ========================= #}
+  <main class="content content--article">
+    <section class="block">
+      <h2 class="serif">弁護士事務所のITリスク、うちは本当に大丈夫？</h2>
+      <h3>専門職ゆえに「ITは後回し」になりやすい</h3>
+      <p>
+        日々の案件対応が優先され、端末・アカウント・データ管理は「問題が起きた時に考える」運用になりがちです。
+        しかし、運用が暗黙知のままだと、引継ぎや人の入替えで一気にリスクが増えます。
+      </p>
+      <h3>小規模でも狙われる理由</h3>
+      <p>
+        攻撃は規模ではなく「守りの薄さ」を見て行われます。
+        個人情報・機微情報を扱う事務所は、結果として標的になりやすい領域です。
+      </p>
+    </section>
+
+    <section class="block">
+      <h2 class="serif">実際に多いトラブル・ヒヤリ事例</h2>
+      <h3>USB・個人端末による情報持ち出し</h3>
+      <p>
+        例外運用が積み重なると、どの端末に何が入っているか追えなくなります。
+      </p>
+      <h3>バックアップがなく復旧できない</h3>
+      <p>
+        ランサムウェアや誤削除により、過去データが戻せないケースがあります。
+        「バックアップがあるつもり」になっていることも多いです。
+      </p>
+      <h3>職員ごとのITルールが曖昧</h3>
+      <p>
+        パスワード、クラウド共有、在宅勤務の扱いなど、ルールの不統一が事故の入口になります。
+      </p>
+    </section>
+
+    <section class="block">
+      <h2 class="serif">点数評価をしない「自己診断」という考え方</h2>
+      <h3>できていない＝悪い、ではない</h3>
+      <p>
+        現実的に、すべてを完璧に揃えるのは難しいです。
+        本診断は「現状を言語化して、優先順位を付ける」ための整理ツールです。
+      </p>
+      <h3>現状を把握することが目的</h3>
+      <p>
+        まずは「判断できる状態」を作り、少ない手数でリスクを下げる進め方を取ります。
+      </p>
+    </section>
+
+    <section class="block">
+      <h2 class="serif">このITリスク自己診断で分かること</h2>
+      <ul class="list">
+        <li><strong>端末・アカウント管理</strong>：利用端末の区分、権限、認証の考え方</li>
+        <li><strong>データ・バックアップ</strong>：保存先、復旧性、運用の属人化</li>
+        <li><strong>ネットワーク・外部接続</strong>：Wi-Fi、来客用分離、外部接続のルール</li>
+        <li><strong>職員ルール・教育</strong>：共有手順、持出し、インシデント時の動き</li>
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2 class="serif">診断後にできること</h2>
+      <h3>優先順位の整理</h3>
+      <p>
+        「高／中／低」の観点で、まず着手すべき論点を明確にできます。
+      </p>
+      <h3>顧問先・関係者への説明材料になる</h3>
+      <p>
+        リスクを“感覚”ではなく、項目として整理して共有できるようになります。
+      </p>
+    </section>
+
+    <section class="block">
+      <h2 class="serif">診断は無料・外部送信なし</h2>
+      <h3>回答内容は保存されません</h3>
+      <p>本診断は、回答内容を外部に送信・保存しない設計です（端末内で完結）。</p>
+      <h3>5〜10分で完了</h3>
+      <p>すべてに自信を持って答えなくても大丈夫です。「わからない」も重要なサインです。</p>
+    </section>
+
+    <section class="block">
+      <h2 class="serif">IT顧問・改善支援について</h2>
+      <p>
+        ツール販売が目的ではなく、理想状態の整理→現状把握→GAP分析→施策立案→運用定着（PDCA）を支援します。
+        必要があれば診断後にご相談ください。
+      </p>
+    </section>
+
+    <section class="block">
+      <div class="cta-card">
+        <h2 class="serif">ITリスク自己診断を始める</h2>
+        <p class="cta-lead">
+          今のIT運用を、感覚ではなく整理された形で把握できます。
+        </p>
+
+        <form action="{{ url_for('start_check') }}" method="post">
+          <button class="btn primary btn-hero" type="submit">
+            診断を開始する（無料）
+          </button>
+        </form>
+
+        <p class="hero-note hero-note--tight">
+          ※回答内容は外部へ送信・保存されません（端末内で完結）
+        </p>
+      </div>
+    </section>
+  </main>
+
+</div>
+
+{% endblock %}

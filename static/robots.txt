@@ -1,4 +1,6 @@
 User-agent: *
-Allow: /
+Disallow: /check/
+
+Allow: /lawyer-it-risk
 
 Sitemap: https://security.aokishoji.com/sitemap.xml

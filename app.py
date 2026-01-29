@@ -2,7 +2,16 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from flask import Flask, render_template, request, redirect, url_for, session, make_response, send_from_directory
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    make_response,
+    send_from_directory,
+)
 from playwright.sync_api import sync_playwright
 
 from questions import (
@@ -15,91 +24,58 @@ from questions import (
     validate_questions,
 )
 
+# --------------------------
+# Flask 初期化
+# --------------------------
 app = Flask(__name__, static_folder="static")
 app.secret_key = "change-me"  # 本番は環境変数へ
 
 
+# --------------------------
+# robots / sitemap
+# --------------------------
 @app.get("/robots.txt")
 def robots_txt():
     return send_from_directory(app.static_folder, "robots.txt", mimetype="text/plain")
 
+
 @app.get("/sitemap.xml")
 def sitemap_xml():
-    return send_from_directory(app.static_folder, "sitemap.xml", mimetype="application/xml")
+    return send_from_directory(
+        app.static_folder, "sitemap.xml", mimetype="application/xml"
+    )
+
 
 # --------------------------
-# 集計・結果生成
+# 集計・結果生成ロジック
 # --------------------------
 def overall_judgement(counts: dict) -> dict:
     if counts["high"] > 0:
         return {
             "code": "優先対応",
             "message": "優先して整理・ルール化したい論点があります。",
-            "lead": "まずは「リスク：高」の項目から着手し、所内の運用を“判断できる状態”に整えるのがおすすめです。",
+            "lead": "まずは「リスク：高」の項目から着手するのがおすすめです。",
         }
     if counts["medium"] > 0:
         return {
             "code": "要整理",
             "message": "いくつか整理すると安心できる論点があります。",
-            "lead": "「リスク：中」の項目を中心に、現状の棚卸しと簡単なルール化から始めるのがおすすめです。",
+            "lead": "現状整理と簡単なルール化から始めるのがおすすめです。",
         }
     if counts["low"] > 0:
         return {
             "code": "軽微",
-            "message": "大きな懸念は多くありませんが、整えるとより安心です。",
-            "lead": "余力のあるタイミングで「リスク：低」の項目を整理しておくと、トラブル耐性が上がります。",
+            "message": "大きな懸念は多くありません。",
+            "lead": "余力のあるタイミングで整理すると安心です。",
         }
     return {
         "code": "問題なし",
-        "message": "現時点で、優先して整理すべき論点は見当たりません。",
-        "lead": "運用が変わったタイミングで、定期的に見直すのがおすすめです。",
+        "message": "優先して整理すべき論点は見当たりません。",
+        "lead": "運用が変わったら定期的に見直しましょう。",
     }
 
 
-def build_rows_all(answers: dict) -> list[dict]:
-    rows: list[dict] = []
-    for sec, item in iter_items():
-        qid = item["id"]
-        ans = answers.get(qid)
-        if ans not in VALID_ANSWERS:
-            ans = "unknown"
-
-        risk = item.get("risk", "medium")
-        if risk not in RISK_LABELS:
-            risk = "medium"
-
-        # result_by_answer があれば優先
-        res = {}
-        if "result_by_answer" in item and isinstance(item["result_by_answer"], dict):
-            res = item["result_by_answer"].get(ans, {}) or {}
-        if not res:
-            res = item.get("result", {}) or {}
-
-        rows.append(
-            {
-                "section_id": sec["id"],
-                "section_title": sec["title"],
-                "risk": risk,
-                "risk_label": RISK_LABELS[risk]["label"],
-                "question": item["q"],
-                "answer": ans,
-                "answer_label": ANSWER_LABEL.get(ans, ans),
-                "title": res.get("title", ""),
-                "why": res.get("why", ""),
-                "next": res.get("next", []) or [],
-            }
-        )
-    return rows
-
-
-def build_section_summary(answers: dict) -> tuple[list[dict], dict]:
-    """
-    セクションごとに
-      - 全件
-      - 回答内訳(yes/no/unknown)
-      - 指摘（= show_if_answer_in に該当するもの）をリスク別に
-    を集計
-    """
+def build_section_summary(answers: dict):
     summary = defaultdict(
         lambda: {
             "section_id": "",
@@ -115,7 +91,7 @@ def build_section_summary(answers: dict) -> tuple[list[dict], dict]:
         sid = sec["id"]
         qid = item["id"]
 
-        ans = answers.get(qid)
+        ans = answers.get(qid, "unknown")
         if ans not in VALID_ANSWERS:
             ans = "unknown"
 
@@ -125,29 +101,28 @@ def build_section_summary(answers: dict) -> tuple[list[dict], dict]:
 
         s = summary[sid]
         s["section_id"] = sid
-        s["title"] = sec.get("title", sid)
+        s["title"] = sec["title"]
         s["total"] += 1
         s["answers"][ans] += 1
 
-        # 指摘対象（デフォルト：no/unknown）
         show_if = item.get("show_if_answer_in", ["no", "unknown"])
         if ans in show_if:
             s["hit_total"] += 1
             s["hit_by_risk"][risk] += 1
 
-    rows = [summary[sec["id"]] for sec in SECTIONS if sec["id"] in summary]
+    rows = [summary[sec["id"]] for sec in SECTIONS]
     by_id = {r["section_id"]: r for r in rows}
     return rows, by_id
 
 
-def build_rows_by_section(answers: dict, section_summary_by_id: dict) -> list[dict]:
-    buckets: list[dict] = []
+def build_rows_by_section(answers: dict, summary_by_id: dict):
+    buckets = []
 
     for sec in SECTIONS:
-        rows: list[dict] = []
+        rows = []
         for item in sec["items"]:
             qid = item["id"]
-            ans = answers.get(qid)
+            ans = answers.get(qid, "unknown")
             if ans not in VALID_ANSWERS:
                 ans = "unknown"
 
@@ -156,7 +131,7 @@ def build_rows_by_section(answers: dict, section_summary_by_id: dict) -> list[di
                 risk = "medium"
 
             res = {}
-            if "result_by_answer" in item and isinstance(item["result_by_answer"], dict):
+            if "result_by_answer" in item:
                 res = item["result_by_answer"].get(ans, {}) or {}
             if not res:
                 res = item.get("result", {}) or {}
@@ -170,19 +145,23 @@ def build_rows_by_section(answers: dict, section_summary_by_id: dict) -> list[di
                     "answer_label": ANSWER_LABEL.get(ans, ans),
                     "title": res.get("title", ""),
                     "why": res.get("why", ""),
-                    "next": res.get("next", []) or [],
+                    "next": res.get("next", []),
                 }
             )
 
-        ssum = section_summary_by_id.get(sec["id"], {})
+        ssum = summary_by_id.get(sec["id"], {})
         buckets.append(
             {
                 "section_id": sec["id"],
                 "title": sec["title"],
                 "total": ssum.get("total", len(rows)),
                 "hit_total": ssum.get("hit_total", 0),
-                "hit_by_risk": ssum.get("hit_by_risk", {"high": 0, "medium": 0, "low": 0}),
-                "answers": ssum.get("answers", {"yes": 0, "no": 0, "unknown": 0}),
+                "hit_by_risk": ssum.get(
+                    "hit_by_risk", {"high": 0, "medium": 0, "low": 0}
+                ),
+                "answers": ssum.get(
+                    "answers", {"yes": 0, "no": 0, "unknown": 0}
+                ),
                 "rows": rows,
             }
         )
@@ -196,7 +175,7 @@ def build_result_context(is_pdf: bool = False) -> dict:
 
     for _, item in iter_items():
         ans = answers.get(item["id"])
-        if ans in ("no", "unknown") or ans is None:
+        if ans in ("no", "unknown", None):
             risk = item.get("risk", "medium")
             if risk not in counts:
                 risk = "medium"
@@ -205,73 +184,56 @@ def build_result_context(is_pdf: bool = False) -> dict:
     overall = overall_judgement(counts)
     section_summary, section_summary_by_id = build_section_summary(answers)
     sections = build_rows_by_section(answers, section_summary_by_id)
-    all_rows = build_rows_all(answers)
-
-    # ▼▼▼ ここから追加 ▼▼▼
-    total_questions = len(all_rows)
-    unknown_total = sum(s["answers"]["unknown"] for s in section_summary)
-    unknown_rate = (unknown_total / total_questions) if total_questions else 0.0
-
-    assist_flags = {
-        "high_ge_3": counts["high"] >= 3,
-        "unknown_ge_30pct": unknown_rate >= 0.30,
-        # 例：主要3分野のどれかが未整備（指摘が1件でもあれば）
-        # ※ id はあなたの SECTIONS の id に合わせて調整してOK
-        "core_unready": any(
-            section_summary_by_id.get(sid, {}).get("hit_total", 0) > 0
-            for sid in ("device", "backup", "network")
-        ),
-        # 職員複数は入力がないので、とりあえずテンプレ側で文言だけ表示（任意）
-        "multi_staff_rule_oral": False,
-    }
-
-    assist_hits = []
-    if assist_flags["high_ge_3"]:
-        assist_hits.append("高リスクの項目が多い（例：3件以上）")
-    if assist_flags["unknown_ge_30pct"]:
-        assist_hits.append(f"「わからない」が多い（{unknown_total}/{total_questions}件：{unknown_rate:.0%}）")
-    if assist_flags["core_unready"]:
-        assist_hits.append("端末管理／バックアップ／ネットワークのいずれかが未整備")
-
-    # ▲▲▲ ここまで追加 ▲▲▲
 
     return {
         "overall": overall,
         "counts": counts,
-        "all_rows": all_rows,
         "section_summary": section_summary,
         "sections": sections,
         "is_pdf": is_pdf,
-
-        # ▼ 追加でテンプレに渡す
-        "total_questions": total_questions,
-        "unknown_total": unknown_total,
-        "unknown_rate": unknown_rate,
-        "assist_flags": assist_flags,
-        "assist_hits": assist_hits,
     }
 
 
+# =====================================================
+# ルーティング（★重複なし）
+# =====================================================
 
-# --------------------------
-# ルーティング
-# --------------------------
-@app.route("/")
+# ① トップ → SEO LP
+@app.get("/")
 def index():
-    return redirect(url_for("start"))
+    return redirect(url_for("start_lawyer_it_risk"), code=302)
 
 
+# ② SEO用 LP
+@app.get("/lawyer-it-risk")
+def start_lawyer_it_risk():
+    return render_template(
+        "start_lawyer_it_risk.html",
+        total_sections=len(SECTIONS),
+        choices=CHOICES,
+    )
+
+
+# ③ 診断スタート
 @app.route("/check", methods=["GET", "POST"])
-def start():
+def start_check():
     if request.method == "POST":
         session["answers"] = {}
-        return redirect(url_for("section", idx=0))
-    return render_template("start.html", total_sections=len(SECTIONS), choices=CHOICES)
+        return redirect(url_for("check_section", idx=0))
+
+    return render_template(
+        "start.html",
+        total_sections=len(SECTIONS),
+        choices=CHOICES,
+    )
 
 
+# ④ 設問ページ
 @app.route("/check/q/<int:idx>", methods=["GET", "POST"])
-def section(idx: int):
-    if idx < 0 or idx >= len(SECTIONS):
+def check_section(idx: int):
+    if idx < 0:
+        return redirect(url_for("start_check"))
+    if idx >= len(SECTIONS):
         return redirect(url_for("result"))
 
     answers = session.get("answers", {}) or {}
@@ -287,9 +249,9 @@ def section(idx: int):
         session["answers"] = answers
 
         if "prev" in request.form:
-            return redirect(url_for("section", idx=idx - 1))
+            return redirect(url_for("check_section", idx=idx - 1))
         if "next" in request.form:
-            return redirect(url_for("section", idx=idx + 1))
+            return redirect(url_for("check_section", idx=idx + 1))
         return redirect(url_for("result"))
 
     progress = {"current": idx + 1, "total": len(SECTIONS)}
@@ -304,20 +266,21 @@ def section(idx: int):
     )
 
 
-@app.route("/check/result")
+# ⑤ 結果画面
+@app.get("/check/result")
 def result():
     ctx = build_result_context(is_pdf=False)
     return render_template("result.html", **ctx)
 
 
-# ✅ PDF用：展開済みHTML（CSS相対パスが自然に効く）
+# ⑥ PDF表示用（HTML）
 @app.get("/check/result/print")
 def result_print():
     ctx = build_result_context(is_pdf=True)
     return render_template("result.html", **ctx)
 
 
-# ✅ PDF生成：/check/result/print を開いてPDF化（最安定）
+# ⑦ PDF生成
 @app.get("/check/result/pdf")
 def result_pdf():
     print_url = request.url_root.rstrip("/") + "/check/result/print"
@@ -326,7 +289,7 @@ def result_pdf():
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(print_url, wait_until="networkidle")
-        page.wait_for_timeout(200)  # 念のため
+        page.wait_for_timeout(200)
 
         pdf_bytes = page.pdf(
             format="A4",
@@ -337,10 +300,15 @@ def result_pdf():
 
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
-    resp.headers["Content-Disposition"] = 'attachment; filename="security_check_result.pdf"'
+    resp.headers[
+        "Content-Disposition"
+    ] = 'attachment; filename="security_check_result.pdf"'
     return resp
 
 
+# --------------------------
+# 起動
+# --------------------------
 if __name__ == "__main__":
     validate_questions(raise_on_error=True)
     app.run(debug=True)

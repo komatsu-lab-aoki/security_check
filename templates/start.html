@@ -1,19 +1,18 @@
-{# templates/start.html #}
+﻿{# templates/start.html #}
 {% extends "base.html" %}
 
-{% block title %}弁護士事務所のIT・情報セキュリティ無料自己診断｜10分セルフチェック｜青木商事{% endblock %}
+{% block title %}弁護士事務所のITリスク自己診断｜診断開始（無料）{% endblock %}
 
-{% block description %}
-弁護士事務所向けのIT・情報セキュリティ自己診断（無料）。端末管理・データ保護・ネットワーク・職員ルールを10〜15分で整理・可視化。回答内容は外部送信・保存されません。
-{% endblock %}
+{% block description %}弁護士事務所向けITリスク自己診断。はい／いいえで回答するだけで、端末管理・バックアップ・ネットワーク等を短時間で確認できます（無料・外部送信なし）。{% endblock %}
+
+{% block robots %}noindex,follow{% endblock %}
+
+{% block canonical %}{{ url_for('lawyer_it_risk', _external=True) }}{% endblock %}
+{% block og_url %}{{ url_for('lawyer_it_risk', _external=True) }}{% endblock %}
 
 {% block content %}
 
-<nav class="breadcrumb breadcrumb--optional" aria-label="パンくず">
-  <a href="/check">トップ</a>
-  <span aria-hidden="true">›</span>
-  <span>ITリスク自己診断</span>
-</nav>
+
 
 <header class="hero hero--simple">
   <h1 class="hero-title serif">弁護士事務所向け<br>ITリスク・セキュリティ自己診断</h1>
@@ -30,13 +29,13 @@
   <div class="hero-meta hero-meta--wrap">
     <span>所要時間：10〜15分</span>
     <span class="dot" aria-hidden="true">•</span>
-    <span>全{{ total_sections }}カテゴリ</span>
+    <span>全{{ total_sections }}分野</span>
     <span class="dot" aria-hidden="true">•</span>
     <span>回答：はい／いいえ／わからない</span>
   </div>
 
   <div class="hero-cta hero-cta--simple">
-    <form method="post" action="{{ url_for('start') }}">
+    <form method="post" action="{{ url_for('start_check') }}">
       <button class="btn primary btn-hero" type="submit">診断を開始する（無料）</button>
     </form>
     <p class="hero-note hero-note--tight">
@@ -46,3 +45,4 @@
 </header>
 
 {% endblock %}
+
