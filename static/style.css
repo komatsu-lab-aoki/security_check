@@ -849,3 +849,30 @@ details.genre[open] .genre-arrow{ transform: rotate(180deg); }
   margin-top: 12px;
   line-height: 1.6;
 }
+
+.faq-item {
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  background: #fff;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.faq-item p {
+  margin: 10px 0 0;
+  line-height: 1.7;
+}
+.faq-divider {
+  margin: 64px 0 48px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+.faq-lead {
+  margin: 8px 0 24px;
+  color: #666;
+  font-size: 0.95rem;
+}

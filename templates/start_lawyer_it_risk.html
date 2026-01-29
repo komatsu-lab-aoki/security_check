@@ -123,10 +123,7 @@
 
     <section class="block">
       <h2 class="serif">診断は無料・外部送信なし</h2>
-      <h3>回答内容は保存されません</h3>
-      <p>本診断は、回答内容を外部に送信・保存しない設計です（端末内で完結）。</p>
-      <h3>5〜10分で完了</h3>
-      <p>すべてに自信を持って答えなくても大丈夫です。「わからない」も重要なサインです。</p>
+      <p>回答内容は保存されず、端末内で完結します。安心して現状整理にご利用ください。</p>
     </section>
 
     <section class="block">
@@ -137,26 +134,112 @@
       </p>
     </section>
 
+    <div class="faq-divider"></div>
+
+    <section class="block">
+      <h2 class="serif">よくあるご質問（FAQ）</h2>
+      <p class="faq-lead">ご利用前によくいただくご質問をまとめました。</p>
+
+      <div class="faq">
+        <details class="faq-item">
+          <summary>このITリスク自己診断は本当に無料ですか？</summary>
+          <p>はい、完全に無料でご利用いただけます。診断結果の確認まで一切費用はかかりません。自動的な課金や申込みもありません。</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>診断の回答内容や事務所名は保存されますか？</summary>
+          <p>いいえ、回答内容や事務所名が外部に送信・保存されることはありません。本診断は、事務所内で現状のIT運用を整理する目的でご利用いただけます。</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>小規模な法律事務所でも診断する意味はありますか？</summary>
+          <p>はい、むしろ小規模な事務所ほど有効です。IT担当が不明確・運用が属人化しやすく、端末管理やバックアップが後回しになりがちなため、リスクが見えにくくなります。</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>ITやセキュリティの専門知識がなくても回答できますか？</summary>
+          <p>はい、専門知識は不要です。「はい／いいえ／わからない」で回答できる形式で、IT用語もできるだけ避けています。</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>診断結果を見たあと、必ず相談しなければいけませんか？</summary>
+          <p>いいえ、相談は必須ではありません。診断結果は現状把握や事務所内共有にご利用ください。必要な場合にのみ、お気軽にご相談いただけます。</p>
+        </details>
+      </div>
+    </section>
+
+    
+    
     <section class="block">
       <div class="cta-card">
         <h2 class="serif">ITリスク自己診断を始める</h2>
         <p class="cta-lead">
           今のIT運用を、感覚ではなく整理された形で把握できます。
         </p>
-
+        
         <form action="{{ url_for('start_check') }}" method="post">
           <button class="btn primary btn-hero" type="submit">
             診断を開始する（無料）
           </button>
         </form>
-
+        
         <p class="hero-note hero-note--tight">
           ※回答内容は外部へ送信・保存されません（端末内で完結）
         </p>
       </div>
     </section>
-  </main>
 
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "このITリスク自己診断は本当に無料ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、完全に無料でご利用いただけます。診断結果の確認まで一切費用はかかりません。自動的な課金や申込みもありません。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "診断の回答内容や事務所名は保存されますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "いいえ、回答内容や事務所名が外部に送信・保存されることはありません。本診断は、事務所内で現状のIT運用を整理する目的でご利用いただけます。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "小規模な法律事務所でも診断する意味はありますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、むしろ小規模な事務所ほど有効です。IT担当が不明確・運用が属人化しやすく、端末管理やバックアップが後回しになりがちなため、リスクが見えにくくなります。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "ITやセキュリティの専門知識がなくても回答できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、専門知識は不要です。「はい／いいえ／わからない」で回答できる形式で、IT用語もできるだけ避けています。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "診断結果を見たあと、必ず相談しなければいけませんか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "いいえ、相談は必須ではありません。診断結果は現状把握や事務所内共有にご利用ください。必要な場合にのみ、お気軽にご相談いただけます。"
+          }
+        }
+      ]
+    }
+    </script>
+
+  </main>
+  
 </div>
 
 {% endblock %}
