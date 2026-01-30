@@ -31,6 +31,13 @@ app = Flask(__name__, static_folder="static")
 app.secret_key = "change-me"  # 本番は環境変数へ
 
 
+from flask import send_from_directory
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
+
+
 # --------------------------
 # robots / sitemap
 # --------------------------
