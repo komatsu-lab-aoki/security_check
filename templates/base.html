@@ -8,6 +8,12 @@
   <!-- title -->
   <title>{% block title %}弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事{% endblock %}</title>
 
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.png') }}">
+
   <!-- meta description（1行推奨） -->
   <meta name="description" content="{% block description %}弁護士事務所向けのITリスク・セキュリティ自己診断。端末・データ・ネットワーク・職員ルールまで、5〜15分で事務所のIT運用リスクを整理・可視化します。{% endblock %}">
 
