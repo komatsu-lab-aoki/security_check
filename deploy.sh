@@ -11,4 +11,3 @@ echo "[deploy] start service"
 systemctl start security_check.service
 
 systemctl status security_check.service --no-pager
-EOF
