@@ -2,12 +2,14 @@
 {% extends "base.html" %}
 
 {% block title %}弁護士事務所のITリスク自己診断｜診断開始（無料）{% endblock %}
-
 {% block description %}弁護士事務所向けITリスク自己診断。はい／いいえで回答するだけで、端末管理・バックアップ・ネットワーク等を短時間で確認できます（無料・外部送信なし）。{% endblock %}
 
 {% block robots %}noindex,follow{% endblock %}
 
-{% block canonical %}{{ url_for('start_check', _external=True) }}{% endblock %}
+{# SEO評価はハブへ集約 #}
+{% block canonical %}https://security.aokishoji.com/lawyer-it-risk{% endblock %}
+
+{# シェアURLは入口のまま（任意） #}
 {% block og_url %}{{ url_for('start_check', _external=True) }}{% endblock %}
 
 {% block content %}

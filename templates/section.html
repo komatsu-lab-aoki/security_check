@@ -1,8 +1,14 @@
 ﻿{# templates/section.html #}
 {% extends "base.html" %}
-{% block title %}{{ sec.title }} | ITリスク自己診断{% endblock %}
-{% block robots %}noindex, nofollow{% endblock %}
 
+{% block title %}{{ sec.title }} | ITリスク自己診断{% endblock %}
+
+{# インデックスさせないが、内部リンクは辿らせる #}
+{% block robots %}noindex,follow{% endblock %}
+
+{# 正規URLはSEOハブに寄せる #}
+{% block canonical %}https://security.aokishoji.com/lawyer-it-risk{% endblock %}
+{% block og_url %}{{ request.base_url }}{% endblock %}
 {% block content %}
 
 <div class="breadcrumb">

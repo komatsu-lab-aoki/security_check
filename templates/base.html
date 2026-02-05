@@ -29,7 +29,7 @@
   {% endif %}
 
   <!-- canonical（クエリを除外するなら base_url） -->
-  <link rel="canonical" href="{% block canonical %}https://security.aokishoji.com/lawyer-it-risk{% endblock %}">
+  <link rel="canonical" href="{% block canonical %}{{ request.base_url }}{% endblock %}">
   
   <!-- OGP -->
   <meta property="og:type" content="website">
