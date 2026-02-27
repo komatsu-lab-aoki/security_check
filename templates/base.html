@@ -8,17 +8,13 @@
   <!-- title -->
   <title>{% block title %}弁護士事務所向け ITリスク・セキュリティ自己診断 | 青木商事{% endblock %}</title>
 
-  <!-- favicon (Chrome / Firefox / Edge) -->
+  <!-- favicon -->
   <link rel="icon" href="/favicon.ico">
-
-  <!-- PNG fallback -->
   <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
-
-  <!-- iOS / iPad -->
   <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon.png">
 
-  <!-- meta description（1行推奨） -->
+  <!-- meta description -->
   <meta name="description" content="{% block description %}弁護士事務所向けのITリスク・セキュリティ自己診断。端末・データ・ネットワーク・職員ルールまで、5〜15分で事務所のIT運用リスクを整理・可視化します。{% endblock %}">
 
   <!-- robots -->
@@ -28,27 +24,31 @@
     <meta name="robots" content="index,follow">
   {% endif %}
 
-  <!-- canonical（クエリを除外するなら base_url） -->
+  <!-- canonical -->
   <link rel="canonical" href="{% block canonical %}{{ request.base_url }}{% endblock %}">
-  
+
   <!-- OGP -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
 
-  {# og:title は title と同じ値をデフォにする（ブロックの再定義はしない） #}
   <meta property="og:title" content="{% block og_title %}{{ self.title() | striptags | trim }}{% endblock %}">
-
-  {# og:description は description と同じ値をデフォにする #}
   <meta property="og:description" content="{% block og_description %}{{ self.description() | striptags | trim }}{% endblock %}">
-
-  {# og:url は canonical と同じ値をデフォにする #}
   <meta property="og:url" content="{% block og_url %}{{ self.canonical() | striptags | trim }}{% endblock %}">
 
-  <!-- <meta property="og:image" content="https://security.aokishoji.com/static/ogp.png"> -->
+  {% block og_image %}
+  <meta property="og:image" content="https://security.aokishoji.com/static/og_lawyer_it_risk.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="弁護士事務所向け ITリスク・セキュリティ自己診断">
+  {% endblock %}
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ self.title() | striptags | trim }}">
+  <meta name="twitter:description" content="{{ self.description() | striptags | trim }}">
+  <meta name="twitter:image" content="https://security.aokishoji.com/static/og_lawyer_it_risk.png">
 
+  <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
   <!-- fonts -->
@@ -62,7 +62,6 @@
     <div class="header">
       <div class="brand">
         <a href="{{ url_for('start_lawyer_it_risk') }}" class="header-logo">
-
           <img src="{{ url_for('static', filename='original.png') }}"
                alt="弁護士事務所向け ITリスク・セキュリティ自己診断｜株式会社青木商事">
         </a>
