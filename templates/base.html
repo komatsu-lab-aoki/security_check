@@ -93,5 +93,19 @@
       提供：株式会社青木商事
     </div>
   </div>
+  <script>
+    function trackStartDiagnosis(e, placement){
+      try {
+        e.preventDefault();
+        gtag('event', 'start_diagnosis', {
+          placement: placement,
+          page_path: location.pathname
+        });
+        setTimeout(function(){ e.target.submit(); }, 150);
+      } catch (err) {
+        e.target.submit();
+      }
+    }
+  </script>
 </body>
 </html>

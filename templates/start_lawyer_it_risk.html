@@ -39,10 +39,11 @@
       </p>
 
       <div class="hero-cta hero-cta--simple">
-        <form action="{{ url_for('start_check') }}" method="post">
-          <button class="btn primary btn-hero" type="submit">診断を開始する（無料）</button>
+        <form action="{{ url_for('start_check') }}" method="post" onsubmit="trackStartDiagnosis(event, 'bottom');">
+          <button class="btn primary btn-hero" type="submit">
+            診断を開始する（無料）
+          </button>
         </form>
-
         <p class="hero-note hero-note--tight">
           ※回答内容は外部へ送信・保存されません（端末内で完結）
         </p>
@@ -177,7 +178,7 @@
           今のIT運用を、感覚ではなく整理された形で把握できます。
         </p>
         
-        <form action="{{ url_for('start_check') }}" method="post">
+        <form action="{{ url_for('start_check') }}" method="post" onsubmit="trackStartDiagnosis(event, 'hero');">
           <button class="btn primary btn-hero" type="submit">
             診断を開始する（無料）
           </button>
