@@ -56,29 +56,40 @@ def sitemap_xml():
 # --------------------------
 # 集計・結果生成ロジック
 # --------------------------
+RISK_RESULT_LABELS = {
+    "high": "優先的に整理したい項目があります",
+    "medium": "確認したい項目があります",
+    "low": "おおむね整理されています",
+}
+
+
 def overall_judgement(counts: dict) -> dict:
     if counts["high"] > 0:
         return {
-            "code": "優先対応",
-            "message": "優先して整理・ルール化したい論点があります。",
-            "lead": "まずは「リスク：高」の項目から着手するのがおすすめです。",
+            "code": RISK_RESULT_LABELS["high"],
+            "tone": "high",
+            "message": "優先的に整理したい項目があります。",
+            "lead": "すべてを一度に進めるのではなく、管理者・記録場所・相談先から整理するのがおすすめです。",
         }
     if counts["medium"] > 0:
         return {
-            "code": "要整理",
-            "message": "いくつか整理すると安心できる論点があります。",
-            "lead": "現状整理と簡単なルール化から始めるのがおすすめです。",
+            "code": RISK_RESULT_LABELS["medium"],
+            "tone": "medium",
+            "message": "いくつか確認しておきたい項目があります。",
+            "lead": "現在の運用状況を言語化し、無理なく確認できる形にしていきましょう。",
         }
     if counts["low"] > 0:
         return {
-            "code": "軽微",
-            "message": "大きな懸念は多くありません。",
-            "lead": "余力のあるタイミングで整理すると安心です。",
+            "code": RISK_RESULT_LABELS["low"],
+            "tone": "low",
+            "message": "おおむね整理されています。",
+            "lead": "運用が変わったタイミングで、記録や担当を見直しておくと安心です。",
         }
     return {
-        "code": "問題なし",
-        "message": "優先して整理すべき論点は見当たりません。",
-        "lead": "運用が変わったら定期的に見直しましょう。",
+        "code": RISK_RESULT_LABELS["low"],
+        "tone": "low",
+        "message": "おおむね整理されています。",
+        "lead": "現在の運用を維持しつつ、定期的に見直しましょう。",
     }
 
 
@@ -146,7 +157,9 @@ def build_rows_by_section(answers: dict, summary_by_id: dict):
             rows.append(
                 {
                     "risk": risk,
-                    "risk_label": RISK_LABELS[risk]["label"],
+                    "risk_label": RISK_RESULT_LABELS.get(
+                        risk, RISK_RESULT_LABELS["medium"]
+                    ),
                     "question": item["q"],
                     "answer": ans,
                     "answer_label": ANSWER_LABEL.get(ans, ans),
@@ -163,6 +176,8 @@ def build_rows_by_section(answers: dict, summary_by_id: dict):
                 "title": sec["title"],
                 "total": ssum.get("total", len(rows)),
                 "hit_total": ssum.get("hit_total", 0),
+                "ok_total": ssum.get("answers", {}).get("yes", 0),
+                "confirm_total": ssum.get("hit_total", 0),
                 "hit_by_risk": ssum.get(
                     "hit_by_risk", {"high": 0, "medium": 0, "low": 0}
                 ),
@@ -191,13 +206,19 @@ def build_result_context(is_pdf: bool = False) -> dict:
     overall = overall_judgement(counts)
     section_summary, section_summary_by_id = build_section_summary(answers)
     sections = build_rows_by_section(answers, section_summary_by_id)
+    total_ok = sum(s["answers"]["yes"] for s in section_summary)
+    total_confirm = sum(counts.values())
 
     return {
         "overall": overall,
         "counts": counts,
+        "total_ok": total_ok,
+        "total_confirm": total_confirm,
         "section_summary": section_summary,
         "sections": sections,
         "is_pdf": is_pdf,
+        "contact_url": "https://aokishoji.com/contact",
+        "lawoffice_url": "https://aokishoji.com/lawoffice",
     }
 
 
@@ -291,10 +312,23 @@ def result_print():
 @app.get("/check/result/pdf")
 def result_pdf():
     print_url = request.url_root.rstrip("/") + "/check/result/print"
+    session_cookie_name = app.config.get("SESSION_COOKIE_NAME", "session")
+    session_cookie = request.cookies.get(session_cookie_name)
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page()
+        context = browser.new_context()
+        if session_cookie:
+            context.add_cookies(
+                [
+                    {
+                        "name": session_cookie_name,
+                        "value": session_cookie,
+                        "url": request.url_root.rstrip("/"),
+                    }
+                ]
+            )
+        page = context.new_page()
         page.goto(print_url, wait_until="networkidle")
         page.wait_for_timeout(200)
 
@@ -303,6 +337,7 @@ def result_pdf():
             print_background=True,
             margin={"top": "12mm", "right": "12mm", "bottom": "12mm", "left": "12mm"},
         )
+        context.close()
         browser.close()
 
     resp = make_response(pdf_bytes)

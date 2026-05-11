@@ -1,4 +1,4 @@
-﻿{# templates/result.html（弁護士向け・読みやすい版） #}
+{# templates/result.html（弁護士向け・読みやすい版） #}
 {% extends "base.html" %}
 {% block robots %}noindex, nofollow{% endblock %}
 {% block content %}
@@ -14,37 +14,61 @@
 <section class="plain-block overall-block">
   <div class="plain-head">
     <h2 class="plain-title">総評</h2>
-    <span class="badge {% if overall.code == '優先対応' %}high{% elif overall.code == '要整理' %}medium{% else %}low{% endif %}">
-      {{ overall.code }}
-    </span>
+    <span class="badge {{ overall.tone }}">{{ overall.code }}</span>
   </div>
 
   <p class="overall-lead">{{ overall.message }}<br>{{ overall.lead }}</p>
 </section>
 
-{# ===== 専門家に依頼したほうが良いケース ===== #}
-{% if assist_hits and assist_hits|length > 0 %}
-<section class="plain-block">
+<section class="plain-block result-summary">
   <div class="plain-head">
-    <h2 class="plain-title">専門家に依頼したほうが良いケース</h2>
+    <h2 class="plain-title">結果サマリー</h2>
   </div>
 
-  <p class="overall-lead">
-    今回の結果では、次の点が該当しました。<br>
-    これらは <strong>「自分だけで整理するのが難しくなりやすいサイン」</strong>です。
+  <p>
+    この診断は、事務所のIT環境を評価するものではなく、
+    現在の運用状況を整理するためのものです。
+  </p>
+  <p>
+    今回の結果では、いくつか確認しておきたい項目が見つかりました。
+    まずは、すべてを一度に改善しようとするのではなく、
+    「誰が管理するか」「どこに記録するか」「困ったときに誰へ相談するか」
+    を整理するところから始めるのがおすすめです。
   </p>
 
-  <ul class="list">
-    {% for hit in assist_hits %}
-      <li><strong>{{ hit }}</strong></li>
-    {% endfor %}
-  </ul>
+  <div class="summary-metrics" aria-label="結果件数">
+    <div class="summary-metric">
+      <span class="summary-metric-label">おおむね整理</span>
+      <strong>{{ total_ok }}</strong>
+    </div>
+    <div class="summary-metric">
+      <span class="summary-metric-label">要確認</span>
+      <strong>{{ total_confirm }}</strong>
+    </div>
+    <div class="summary-metric">
+      <span class="summary-metric-label">分野</span>
+      <strong>{{ sections|length }}</strong>
+    </div>
+  </div>
+
+  {% if not is_pdf %}
+    <div class="cta-actions summary-actions">
+      <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
+      <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
+        診断結果をもとに相談する
+      </a>
+    </div>
+  {% else %}
+    <div class="pdf-contact-note">
+      診断結果をもとに相談したい場合は、以下よりお問い合わせください。<br>
+      {{ contact_url }}
+    </div>
+  {% endif %}
 </section>
-{% endif %}
 
 <section class="plain-block list-head">
   <div class="plain-head">
-    <h2 class="plain-title">回答結果／改善例</h2>
+    <h2 class="plain-title">回答結果／整理のヒント</h2>
   </div>
 </section>
 
@@ -54,7 +78,7 @@
     <summary class="genre-summary">
       <div class="genre-left">
         <span class="genre-title">{{ sec.title }}</span>
-        <span class="genre-meta">全{{ sec.total }}件 / 指摘：高{{ sec.hit_by_risk.high }}・中{{ sec.hit_by_risk.medium }}・低{{ sec.hit_by_risk.low }}</span>
+        <span class="genre-meta">全{{ sec.total }}件 / OK {{ sec.ok_total }}件 / 要確認 {{ sec.confirm_total }}件</span>
       </div>
 
       <div class="genre-right">
@@ -73,9 +97,9 @@
             </div>
 
             {% if r.answer == "yes" %}
-              <span class="badge ok">OK</span>
+              <span class="badge ok">おおむね整理</span>
             {% else %}
-              <span class="badge {{ r.risk }}">{{ "リスク：" ~ r.risk_label }}</span>
+              <span class="badge {{ r.risk }}">{{ r.risk_label }}</span>
             {% endif %}
           </div>
 
@@ -109,7 +133,7 @@
               </div>
             {% endif %}
           {% else %}
-            <div class="note" style="margin-top:10px;">※「はい」の項目は、現状維持で問題ありません。</div>
+            <div class="note note-left" style="margin-top:10px;">※この項目は、おおむね整理されています。</div>
           {% endif %}
         </div>
       {% endfor %}
@@ -117,72 +141,68 @@
   </details>
 {% endfor %}
 
-{# ===== 依頼の判断基準（CTA直前） ===== #}
-<section class="plain-block" style="margin-top: 16px;">
-  <div class="card">
-    <div class="section-title">専門家による整理・支援を検討したほうがよいケース</div>
+<section class="plain-block cta-block">
+  <div class="card cta-card">
+    <div class="section-title">より具体的に整理したい場合</div>
     <p class="note note-left" style="margin-top:8px;">
-      次に当てはまる場合、個別に優先順位を整理し、無理のない改善手順（まず何を・どこまで）を決めることをおすすめします。
+      自己診断だけでは判断しづらい場合は、診断結果をもとに、改善優先度を一緒に整理できます。
     </p>
     <ul class="list">
-      <li>高リスクの項目が多い（例：3件以上）</li>
-      <li>「わからない」が多い（運用が把握できていない）</li>
-      <li>端末管理／アカウント管理／バックアップ／ネットワークのいずれかが未整備</li>
-      <li>職員が複数名いて、ルールが口頭運用になっている</li>
+      <li>どこから対応すべきか</li>
+      <li>外部業者に何を確認すべきか</li>
+      <li>顧問契約が必要な状態か</li>
+      <li>スポット対応で足りるか</li>
     </ul>
-    <p class="note note-left" style="margin-top:10px;">
-      ※該当しても「すぐ契約」ではなく、まずは状況整理と優先順位付けだけでも可能です。
-    </p>
-  </div>
-</section>
 
-{# ===== 相談CTA（下部） ===== #}
-<section class="plain-block cta-block">
-  <div class="plain-head">
-    <h2 class="plain-title">相談のご案内</h2>
-  </div>
-
-  <p class="overall-lead cta-lead">
-    ご相談では、診断結果（PDF）をもとに<br>
-    「優先順位」と「まず何を・どこまで整備すべきか」を整理します。<br>
-    実際の設定作業を行わなくても、事務所内で判断・対応できる状態をつくることを目的としています。
-  </p>
-
-  <div class="card cta-card">
-    <div class="section-title">診断結果をもとに、優先順位を一緒に整理できます</div>
+    <div class="price-list" aria-label="有料診断パック料金">
+      <div class="price-row"><span>ITリスク簡易診断</span><strong>5万円（税別）</strong></div>
+      <div class="price-row"><span>標準診断</span><strong>10万円（税別）</strong></div>
+      <div class="price-row"><span>訪問・初期整理</span><strong>20万円（税別）〜</strong></div>
+    </div>
 
     {% if not is_pdf %}
-      <ol class="cta-steps">
-        <li>「PDFをダウンロード」をクリック</li>
-        <li>「優先順位を整理してもらう（相談）」をクリック</li>
-        <li>可能であれば、診断結果（PDF）を添付して送信</li>
-      </ol>
-
       <div class="cta-actions">
-        <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
-        <a class="btn primary" href="https://aokishoji.com/contact" target="_blank" rel="noopener">
-          優先順位を整理してもらう（相談）
+        <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
+          診断結果をもとに相談する
         </a>
       </div>
-
-      <div class="cta-template">
-        <div class="cta-template-title">お問い合わせに添える一文（例）</div>
-        <div class="cta-template-body">
-自己診断PDFを添付します。指摘が出た項目について、優先順位と改善手順の整理を相談したいです。
-現状は（例：職員は◯名／端末は◯台／在宅勤務あり）です。
-        </div>
-        <div class="note cta-template-note note-left">※上記はそのままコピペOKです。必要に応じて括弧内だけ埋めてください。</div>
-      </div>
     {% else %}
-      <p class="note" style="margin-top:8px;">
-        このPDFを添付してご相談ください：<br>
-        https://aokishoji.com/contact
-      </p>
+      <div class="pdf-contact-note">
+        診断結果をもとに相談したい場合は、以下よりお問い合わせください。<br>
+        {{ contact_url }}
+      </div>
     {% endif %}
   </div>
 </section>
 
-{# ===== note誘導（下部・理解を深めたい人向け） ===== #}
+<section class="plain-block cta-block">
+  <div class="card advisor-card">
+    <div class="section-title">継続的にIT判断を相談したい場合</div>
+    <p class="note note-left" style="margin-top:8px;">
+      継続的にIT判断を相談したい場合は、月額IT顧問サービスとして支援できます。
+    </p>
+
+    <div class="price-list" aria-label="IT顧問サービス料金">
+      <div class="price-row"><span>ライト</span><strong>月額5万円（税別）</strong></div>
+      <div class="price-row"><span>スタンダード</span><strong>月額10万円（税別）</strong></div>
+      <div class="price-row"><span>ストラテジック</span><strong>月額15万円（税別）</strong></div>
+    </div>
+
+    {% if not is_pdf %}
+      <div class="cta-actions">
+        <a class="btn" href="{{ lawoffice_url }}" target="_blank" rel="noopener">
+          IT顧問サービスを見る
+        </a>
+      </div>
+    {% else %}
+      <div class="pdf-contact-note">
+        IT顧問サービスの詳細：<br>
+        {{ lawoffice_url }}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
 <section class="plain-block">
   <div class="card" style="background:#f7f7f4;">
     <div class="section-title">診断結果をどう活かすか</div>
@@ -198,27 +218,28 @@
 
     <ul class="list" style="margin-top:8px;">
       <li>IT事故が起きる本当の原因</li>
-      <li>弁護士事務所で優先すべきITリスク</li>
+      <li>弁護士事務所で優先すべきIT項目</li>
       <li>「全部やらなくていい」判断の考え方</li>
     </ul>
 
-    <div class="cta-actions" style="margin-top:12px;">
-      <a class="btn" href="https://note.com/shoji325/n/na3d375d6b524" target="_blank" rel="noopener">
-        noteで詳しく読む（考え方編）
-      </a>
-    </div>
-
-    <div class="note note-left" style="margin-top:10px;">
-      ※ 記事は少し長めです。時間があるときにお読みください。
-    </div>
+    {% if not is_pdf %}
+      <div class="cta-actions" style="margin-top:12px;">
+        <a class="btn" href="https://note.com/shoji325/n/na3d375d6b524" target="_blank" rel="noopener">
+          noteで詳しく読む（考え方編）
+        </a>
+      </div>
+    {% endif %}
   </div>
 </section>
 
-
 <div class="page-note">
   <p>※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。</p>
-  <p>※ご回答内容は外部へ送信・保存されることはありません。<br>
-    　「PDFをダウンロード」からデータの保存をおすすめいたします。</p>
+  {% if not is_pdf %}
+    <p>※ご回答内容は、問い合わせフォーム等へ入力・添付しない限り、外部へ送信されません。<br>
+      　「PDFをダウンロード」からデータの保存をおすすめいたします。</p>
+  {% else %}
+    <p>※ご回答内容は、問い合わせフォーム等へ入力・添付しない限り、外部へ送信されません。</p>
+  {% endif %}
 </div>
 
 {% endblock %}
