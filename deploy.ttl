@@ -1,0 +1,64 @@
+; deploy.ttl — security_check デプロイマクロ
+; SSH接続 → deploy.sh 実行（git pull + サービス再起動）を自動実行
+
+host = '157.7.65.123'
+port = '22'
+username = 'aoki'
+keyfile = 'C:\Users\shoji\.ssh\id_ed25519'
+
+; サーバー上の security_check リポジトリのパス
+repodir = '/apl/aoki/security_check'
+
+; SSH接続
+cmd = 'ssh://'
+strconcat cmd username
+strconcat cmd '@'
+strconcat cmd host
+strconcat cmd ':'
+strconcat cmd port
+strconcat cmd ' /ssh /auth=publickey /user='
+strconcat cmd username
+strconcat cmd ' /keyfile='
+strconcat cmd keyfile
+
+connect cmd
+
+; ログイン完了待ち
+wait '$' 'aoki@' '#'
+
+; デプロイ実行コマンドを組み立て：
+;   cd <repodir> && bash deploy.sh; echo DEPLOY_DONE
+;
+; 末尾に完了マーカー echo を付ける。
+;   DEPLOY_""DONE と書くことで、送信文字列には DEPLOY_DONE が現れず（"" は空文字）、
+;   シェルの出力にだけ DEPLOY_DONE が現れる。
+;   → wait がコマンドのエコーバックではなく「実際の完了出力」だけにヒットする。
+deploycmd = 'cd '
+strconcat deploycmd repodir
+strconcat deploycmd ' && bash deploy.sh; echo DEPLOY_""DONE'
+
+timeout = 180
+sendln deploycmd
+
+:waitdone
+wait 'DEPLOY_DONE' 'password' 'Password' '[sudo]'
+if result = 0 then
+    ; タイムアウト
+    messagebox 'デプロイがタイムアウトしました。手動で確認してください。' 'Deploy'
+    closett
+    end
+endif
+if result >= 2 then
+    ; sudo パスワード入力が必要な場合（NOPASSWD未設定など）
+    inputbox 'sudo パスワードを入力してください' 'Deploy'
+    sendln inputstr
+    goto waitdone
+endif
+
+; ここに来た時点で result = 1（= DEPLOY_DONE 検出 = 本当に完了）
+
+; 完了メッセージ
+messagebox 'デプロイが完了しました' 'Deploy'
+
+; メッセージボックスを閉じたらテラタームも閉じる
+closett
