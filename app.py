@@ -23,6 +23,7 @@ from questions import (
     iter_items,
     validate_questions,
 )
+from ai_questions_short import AI_SECTIONS_SHORT
 
 # --------------------------
 # Flask 初期化
@@ -93,7 +94,7 @@ def overall_judgement(counts: dict) -> dict:
     }
 
 
-def build_section_summary(answers: dict):
+def build_section_summary(answers: dict, sections=SECTIONS):
     summary = defaultdict(
         lambda: {
             "section_id": "",
@@ -105,7 +106,7 @@ def build_section_summary(answers: dict):
         }
     )
 
-    for sec, item in iter_items():
+    for sec, item in iter_items(sections):
         sid = sec["id"]
         qid = item["id"]
 
@@ -128,15 +129,15 @@ def build_section_summary(answers: dict):
             s["hit_total"] += 1
             s["hit_by_risk"][risk] += 1
 
-    rows = [summary[sec["id"]] for sec in SECTIONS]
+    rows = [summary[sec["id"]] for sec in sections]
     by_id = {r["section_id"]: r for r in rows}
     return rows, by_id
 
 
-def build_rows_by_section(answers: dict, summary_by_id: dict):
+def build_rows_by_section(answers: dict, summary_by_id: dict, sections=SECTIONS):
     buckets = []
 
-    for sec in SECTIONS:
+    for sec in sections:
         rows = []
         for item in sec["items"]:
             qid = item["id"]
@@ -191,11 +192,16 @@ def build_rows_by_section(answers: dict, summary_by_id: dict):
     return buckets
 
 
-def build_result_context(is_pdf: bool = False) -> dict:
-    answers = session.get("answers", {}) or {}
+def build_result_context(
+    sections=SECTIONS,
+    answers: dict | None = None,
+    is_pdf: bool = False,
+) -> dict:
+    if answers is None:
+        answers = session.get("answers", {}) or {}
     counts = {"high": 0, "medium": 0, "low": 0}
 
-    for _, item in iter_items():
+    for _, item in iter_items(sections):
         ans = answers.get(item["id"])
         if ans in ("no", "unknown", None):
             risk = item.get("risk", "medium")
@@ -204,8 +210,8 @@ def build_result_context(is_pdf: bool = False) -> dict:
             counts[risk] += 1
 
     overall = overall_judgement(counts)
-    section_summary, section_summary_by_id = build_section_summary(answers)
-    sections = build_rows_by_section(answers, section_summary_by_id)
+    section_summary, section_summary_by_id = build_section_summary(answers, sections)
+    rows = build_rows_by_section(answers, section_summary_by_id, sections)
     total_ok = sum(s["answers"]["yes"] for s in section_summary)
     total_confirm = sum(counts.values())
 
@@ -215,7 +221,7 @@ def build_result_context(is_pdf: bool = False) -> dict:
         "total_ok": total_ok,
         "total_confirm": total_confirm,
         "section_summary": section_summary,
-        "sections": sections,
+        "sections": rows,
         "is_pdf": is_pdf,
         "contact_url": "https://aokishoji.com/contact",
         "lawoffice_url": "https://aokishoji.com/lawoffice",
@@ -223,49 +229,32 @@ def build_result_context(is_pdf: bool = False) -> dict:
 
 
 # =====================================================
-# ルーティング（★重複なし）
+# 診断エンジン共通処理（設問セットを引数で受け取る）
 # =====================================================
-
-# ① トップ → SEO LP
-@app.get("/")
-def index():
-    return redirect(url_for("start_lawyer_it_risk"), code=302)
-
-
-# ② SEO用 LP
-@app.get("/lawyer-it-risk")
-def start_lawyer_it_risk():
-    return render_template(
-        "start_lawyer_it_risk.html",
-        total_sections=len(SECTIONS),
-        choices=CHOICES,
-    )
+#
+# 既存の弁護士向け診断と新規のAI診断は、設問セット（SECTIONS）と
+# セッションキー・ルート名・テンプレ用の見た目（kind）が違うだけなので、
+# 中身のロジックは下記の共通関数に集約する。
+# -----------------------------------------------------
 
 
-# ③ 診断スタート
-@app.route("/check", methods=["GET", "POST"])
-def start_check():
-    if request.method == "POST":
-        session["answers"] = {}
-        return redirect(url_for("check_section", idx=0))
-
-    return render_template(
-        "start.html",
-        total_sections=len(SECTIONS),
-        choices=CHOICES,
-    )
-
-
-# ④ 設問ページ
-@app.route("/check/q/<int:idx>", methods=["GET", "POST"])
-def check_section(idx: int):
+def _render_section(
+    idx: int,
+    sections: list,
+    answers_key: str,
+    section_endpoint: str,
+    start_url: str,
+    result_endpoint: str,
+    kind: str,
+):
+    """設問ページの共通処理（弁護士／AI 共用）。"""
     if idx < 0:
-        return redirect(url_for("start_check"))
-    if idx >= len(SECTIONS):
-        return redirect(url_for("result"))
+        return redirect(start_url)
+    if idx >= len(sections):
+        return redirect(url_for(result_endpoint))
 
-    answers = session.get("answers", {}) or {}
-    sec = SECTIONS[idx]
+    answers = session.get(answers_key, {}) or {}
+    sec = sections[idx]
 
     if request.method == "POST":
         for item in sec["items"]:
@@ -274,15 +263,15 @@ def check_section(idx: int):
             if val in VALID_ANSWERS:
                 answers[key] = val
 
-        session["answers"] = answers
+        session[answers_key] = answers
 
         if "prev" in request.form:
-            return redirect(url_for("check_section", idx=idx - 1))
+            return redirect(url_for(section_endpoint, idx=idx - 1))
         if "next" in request.form:
-            return redirect(url_for("check_section", idx=idx + 1))
-        return redirect(url_for("result"))
+            return redirect(url_for(section_endpoint, idx=idx + 1))
+        return redirect(url_for(result_endpoint))
 
-    progress = {"current": idx + 1, "total": len(SECTIONS)}
+    progress = {"current": idx + 1, "total": len(sections)}
     return render_template(
         "section.html",
         sec=sec,
@@ -291,27 +280,38 @@ def check_section(idx: int):
         answers=answers,
         progress=progress,
         choices=CHOICES,
+        section_endpoint=section_endpoint,
+        start_url=start_url,
+        kind=kind,
     )
 
 
-# ⑤ 結果画面
-@app.get("/check/result")
-def result():
-    ctx = build_result_context(is_pdf=False)
+def _render_result(
+    sections: list,
+    answers_key: str,
+    is_pdf: bool,
+    kind: str,
+    start_url: str,
+    pdf_url: str,
+    branch: str | None = None,
+    lawyer_url: str | None = None,
+):
+    """結果ページの共通処理（弁護士／AI 共用）。"""
+    answers = session.get(answers_key, {}) or {}
+    ctx = build_result_context(sections=sections, answers=answers, is_pdf=is_pdf)
+    ctx.update(
+        kind=kind,
+        start_url=start_url,
+        pdf_url=pdf_url,
+        branch=branch,
+        lawyer_url=lawyer_url,
+    )
     return render_template("result.html", **ctx)
 
 
-# ⑥ PDF表示用（HTML）
-@app.get("/check/result/print")
-def result_print():
-    ctx = build_result_context(is_pdf=True)
-    return render_template("result.html", **ctx)
-
-
-# ⑦ PDF生成
-@app.get("/check/result/pdf")
-def result_pdf():
-    print_url = request.url_root.rstrip("/") + "/check/result/print"
+def _generate_result_pdf(print_path: str, filename: str):
+    """結果HTMLをPlaywrightでPDF化する共通処理（弁護士／AI 共用）。"""
+    print_url = request.url_root.rstrip("/") + print_path
     session_cookie_name = app.config.get("SESSION_COOKIE_NAME", "session")
     session_cookie = request.cookies.get(session_cookie_name)
 
@@ -342,10 +342,171 @@ def result_pdf():
 
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
-    resp.headers[
-        "Content-Disposition"
-    ] = 'attachment; filename="security_check_result.pdf"'
+    resp.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
     return resp
+
+
+# =====================================================
+# ルーティング（★重複なし）
+# =====================================================
+
+# ① トップ → SEO LP
+@app.get("/")
+def index():
+    return redirect(url_for("start_lawyer_it_risk"), code=302)
+
+
+# =====================================================
+# A. 弁護士事務所向け ITリスク・セキュリティ自己診断
+# =====================================================
+
+# ② SEO用 LP
+@app.get("/lawyer-it-risk")
+def start_lawyer_it_risk():
+    return render_template(
+        "start_lawyer_it_risk.html",
+        total_sections=len(SECTIONS),
+        choices=CHOICES,
+    )
+
+
+# ③ 診断スタート
+@app.route("/check", methods=["GET", "POST"])
+def start_check():
+    if request.method == "POST":
+        session["answers"] = {}
+        return redirect(url_for("check_section", idx=0))
+
+    return render_template(
+        "start.html",
+        total_sections=len(SECTIONS),
+        choices=CHOICES,
+    )
+
+
+# ④ 設問ページ
+@app.route("/check/q/<int:idx>", methods=["GET", "POST"])
+def check_section(idx: int):
+    return _render_section(
+        idx=idx,
+        sections=SECTIONS,
+        answers_key="answers",
+        section_endpoint="check_section",
+        start_url=url_for("start_check"),
+        result_endpoint="result",
+        kind="lawyer",
+    )
+
+
+# ⑤ 結果画面
+@app.get("/check/result")
+def result():
+    return _render_result(
+        sections=SECTIONS,
+        answers_key="answers",
+        is_pdf=False,
+        kind="lawyer",
+        start_url=url_for("start_check"),
+        pdf_url=url_for("result_pdf"),
+    )
+
+
+# ⑥ PDF表示用（HTML）
+@app.get("/check/result/print")
+def result_print():
+    return _render_result(
+        sections=SECTIONS,
+        answers_key="answers",
+        is_pdf=True,
+        kind="lawyer",
+        start_url=url_for("start_check"),
+        pdf_url=url_for("result_pdf"),
+    )
+
+
+# ⑦ PDF生成
+@app.get("/check/result/pdf")
+def result_pdf():
+    return _generate_result_pdf(
+        print_path="/check/result/print",
+        filename="security_check_result.pdf",
+    )
+
+
+# =====================================================
+# B. 士業向け AI安全活用 セルフチェック
+# =====================================================
+
+# ① SEO用 LP
+@app.get("/shigyo-ai-check")
+def start_shigyo_ai_check():
+    total_questions = sum(len(sec["items"]) for sec in AI_SECTIONS_SHORT)
+    return render_template(
+        "start_shigyo_ai_check.html",
+        total_sections=len(AI_SECTIONS_SHORT),
+        total_questions=total_questions,
+        choices=CHOICES,
+    )
+
+
+# ② 診断スタート（LPのボタンから POST）
+@app.post("/shigyo-ai-check/start")
+def ai_start_check():
+    session["ai_answers"] = {}
+    return redirect(url_for("ai_check_section", idx=0))
+
+
+# ③ 設問ページ
+@app.route("/shigyo-ai-check/q/<int:idx>", methods=["GET", "POST"])
+def ai_check_section(idx: int):
+    return _render_section(
+        idx=idx,
+        sections=AI_SECTIONS_SHORT,
+        answers_key="ai_answers",
+        section_endpoint="ai_check_section",
+        start_url=url_for("start_shigyo_ai_check"),
+        result_endpoint="ai_result",
+        kind="ai",
+    )
+
+
+# ④ 結果画面
+@app.get("/shigyo-ai-check/result")
+def ai_result():
+    return _render_result(
+        sections=AI_SECTIONS_SHORT,
+        answers_key="ai_answers",
+        is_pdf=False,
+        kind="ai",
+        start_url=url_for("start_shigyo_ai_check"),
+        pdf_url=url_for("ai_result_pdf"),
+        branch="ai",
+        lawyer_url=url_for("start_lawyer_it_risk"),
+    )
+
+
+# ⑤ PDF表示用（HTML）
+@app.get("/shigyo-ai-check/result/print")
+def ai_result_print():
+    return _render_result(
+        sections=AI_SECTIONS_SHORT,
+        answers_key="ai_answers",
+        is_pdf=True,
+        kind="ai",
+        start_url=url_for("start_shigyo_ai_check"),
+        pdf_url=url_for("ai_result_pdf"),
+        branch="ai",
+        lawyer_url=url_for("start_lawyer_it_risk"),
+    )
+
+
+# ⑥ PDF生成
+@app.get("/shigyo-ai-check/result/pdf")
+def ai_result_pdf():
+    return _generate_result_pdf(
+        print_path="/shigyo-ai-check/result/print",
+        filename="shigyo_ai_check_result.pdf",
+    )
 
 
 # --------------------------
@@ -353,4 +514,5 @@ def result_pdf():
 # --------------------------
 if __name__ == "__main__":
     validate_questions(raise_on_error=True)
+    validate_questions(raise_on_error=True, sections=AI_SECTIONS_SHORT)
     app.run(debug=True)

@@ -1,15 +1,16 @@
-{# templates/result.html（弁護士向け・読みやすい版） #}
+{# templates/result.html（弁護士向け・AI診断 共用・読みやすい版） #}
 {% extends "base.html" %}
+{% block title %}{% if branch == 'ai' %}士業向け AI安全活用 セルフチェック｜結果 | 青木商事{% else %}{{ super() }}{% endif %}{% endblock %}
 {% block robots %}noindex, nofollow{% endblock %}
 {% block content %}
 
 <div class="breadcrumb">
-  <a href="{{ url_for('start_check') }}">診断トップへ戻る</a>
+  <a href="{{ start_url }}">診断トップへ戻る</a>
   <span>›</span>
   <span>結果</span>
 </div>
 
-<h1 class="page-title serif">自己診断結果</h1>
+<h1 class="page-title serif">{% if branch == 'ai' %}士業向け AI安全活用 セルフチェック 結果{% else %}自己診断結果{% endif %}</h1>
 
 <section class="plain-block overall-block">
   <div class="plain-head">
@@ -53,7 +54,7 @@
 
   {% if not is_pdf %}
     <div class="cta-actions summary-actions">
-      <a class="btn primary" href="{{ url_for('result_pdf') }}">PDFをダウンロード</a>
+      <a class="btn primary" href="{{ pdf_url }}">PDFをダウンロード</a>
       <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
         診断結果をもとに相談する
       </a>
@@ -141,6 +142,69 @@
   </details>
 {% endfor %}
 
+{% if branch == 'ai' %}
+{# ============================================
+   AI診断：結果一覧の下に置く A/B 分岐ブロック
+   （ai_check_landing.md「2. 結果画面：A/B分岐ブロック」より）
+   ============================================ #}
+<section class="plain-block cta-block">
+  <div class="card cta-card">
+    <div class="section-title">今回のチェックのあとに</div>
+    <p class="note note-left" style="margin-top:8px;">
+      今回のチェックでは、AIを安全に使うための“いまの状態”を整理しました。<br>
+      AIを安全に使うには、土台となるIT運用そのものが整っていることが前提になります。次のいずれかへお進みください。
+    </p>
+
+    {# 選択肢A：自分で深掘りしたい人向け #}
+    <div class="item-block" style="margin-top:14px;">
+      <div class="item-label">A. IT運用全体のリスクも整理する</div>
+      <p class="muted">
+        AIに限らず、端末・データ・バックアップ・職員ルールまで含めた事務所全体のIT運用を診断できます。
+        現在は弁護士事務所向けの診断を公開しています（他士業の方は、下記Bのご相談もご利用ください）。
+      </p>
+      {% if not is_pdf %}
+        <div class="cta-actions" style="margin-top:10px;">
+          <a class="btn" href="{{ lawyer_url }}">弁護士事務所向け ITリスク・セキュリティ自己診断へ</a>
+        </div>
+      {% else %}
+        <div class="pdf-contact-note">
+          弁護士事務所向け ITリスク・セキュリティ自己診断：<br>
+          https://security.aokishoji.com/lawyer-it-risk
+        </div>
+      {% endif %}
+    </div>
+
+    {# 選択肢B：相談したい人向け #}
+    <div class="item-block" style="margin-top:14px;">
+      <div class="item-label">B. 結果について相談する</div>
+      <p class="muted">
+        整理した結果をもとに、AIの安全な使い方〜IT運用の改善まで、IT顧問としてご相談に乗ります。
+      </p>
+      {% if not is_pdf %}
+        <div class="cta-actions" style="margin-top:10px;">
+          <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
+            結果について相談する
+          </a>
+          <a class="btn" href="{{ lawoffice_url }}" target="_blank" rel="noopener">
+            IT顧問サービスを見る
+          </a>
+        </div>
+      {% else %}
+        <div class="pdf-contact-note">
+          ご相談：{{ contact_url }}<br>
+          IT顧問サービス：{{ lawoffice_url }}
+        </div>
+      {% endif %}
+    </div>
+
+    <p class="note note-left" style="margin-top:14px;">
+      ※このチェックは「AIを使うか・使わないか」を決めるものではなく、<strong>使うなら安全に</strong>を実現するための入口です。
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{% if branch != 'ai' %}
 <section class="plain-block cta-block">
   <div class="card cta-card">
     <div class="section-title">より具体的に整理したい場合</div>
@@ -231,6 +295,7 @@
     {% endif %}
   </div>
 </section>
+{% endif %}
 
 <div class="page-note">
   <p>※本診断は監査・評価ではありません。現状整理と優先順位付けのためのセルフチェックです。</p>

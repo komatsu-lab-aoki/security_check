@@ -1,18 +1,18 @@
 ﻿{# templates/section.html #}
 {% extends "base.html" %}
 
-{% block title %}{{ sec.title }} | ITリスク自己診断{% endblock %}
+{% block title %}{{ sec.title }} | {% if kind == 'ai' %}士業向け AI安全活用 セルフチェック{% else %}ITリスク自己診断{% endif %}{% endblock %}
 
 {# インデックスさせないが、内部リンクは辿らせる #}
 {% block robots %}noindex,follow{% endblock %}
 
 {# 正規URLはSEOハブに寄せる #}
-{% block canonical %}https://security.aokishoji.com/lawyer-it-risk{% endblock %}
+{% block canonical %}{% if kind == 'ai' %}https://security.aokishoji.com/shigyo-ai-check{% else %}https://security.aokishoji.com/lawyer-it-risk{% endif %}{% endblock %}
 {% block og_url %}{{ request.base_url }}{% endblock %}
 {% block content %}
 
 <div class="breadcrumb">
-  <a href="{{ url_for('start_check') }}">トップ</a>
+  <a href="{{ start_url }}">トップ</a>
 <span>›</span>
   <span>{{ sec.title }}</span>
 </div>
@@ -29,7 +29,7 @@
     ※ 回答画面では解説は表示しません（結果画面でまとめて確認できます）。
   </div>
   
-  <form method="post" action="{{ url_for('check_section', idx=idx) }}" style="margin-top:14px;">
+  <form method="post" action="{{ url_for(section_endpoint, idx=idx) }}" style="margin-top:14px;">
     <div class="q-list">
       {% for item in sec["items"] %}
       <div class="q-item">
@@ -61,7 +61,7 @@
         {% if idx > 0 %}
         <button class="btn" type="submit" name="prev" value="1">前へ</button>
         {% else %}
-        <a class="btn link" href="{{ url_for('start_check') }}">診断トップへ</a>
+        <a class="btn link" href="{{ start_url }}">診断トップへ</a>
         {% endif %}
       </div>
       

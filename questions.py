@@ -712,19 +712,31 @@ SECTIONS = [
 # ----------------------------
 # 追加：ユーティリティ（app.py 側で使うと便利）
 # ----------------------------
-def iter_items():
-    """全設問をフラットに回す（集計や結果生成で便利）"""
-    for sec in SECTIONS:
+def iter_items(sections=None):
+    """全設問をフラットに回す（集計や結果生成で便利）
+
+    sections を渡せば任意の設問セット（例：AI診断）にも使える。
+    省略時は既存の SECTIONS（弁護士向け診断）。
+    """
+    if sections is None:
+        sections = SECTIONS
+    for sec in sections:
         for item in sec.get("items", []):
             yield sec, item
 
 
-def validate_questions(raise_on_error: bool = True) -> List[str]:
-    """設問定義のミスを早期発見（ID重複や risk の誤字など）"""
+def validate_questions(raise_on_error: bool = True, sections=None) -> List[str]:
+    """設問定義のミスを早期発見（ID重複や risk の誤字など）
+
+    sections を渡せば任意の設問セットを検証できる（省略時は SECTIONS）。
+    """
+    if sections is None:
+        sections = SECTIONS
+
     errors: List[str] = []
     seen_item_ids = set()
 
-    for sec in SECTIONS:
+    for sec in sections:
         sid = sec.get("id")
         stitle = sec.get("title")
         if not sid or not stitle:
