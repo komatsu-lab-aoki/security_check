@@ -294,7 +294,6 @@ def _render_result(
     start_url: str,
     pdf_url: str,
     branch: str | None = None,
-    lawyer_url: str | None = None,
 ):
     """結果ページの共通処理（弁護士／AI 共用）。"""
     answers = session.get(answers_key, {}) or {}
@@ -304,7 +303,6 @@ def _render_result(
         start_url=start_url,
         pdf_url=pdf_url,
         branch=branch,
-        lawyer_url=lawyer_url,
     )
     return render_template("result.html", **ctx)
 
@@ -481,7 +479,6 @@ def ai_result():
         start_url=url_for("start_shigyo_ai_check"),
         pdf_url=url_for("ai_result_pdf"),
         branch="ai",
-        lawyer_url=url_for("start_lawyer_it_risk"),
     )
 
 
@@ -496,7 +493,6 @@ def ai_result_print():
         start_url=url_for("start_shigyo_ai_check"),
         pdf_url=url_for("ai_result_pdf"),
         branch="ai",
-        lawyer_url=url_for("start_lawyer_it_risk"),
     )
 
 

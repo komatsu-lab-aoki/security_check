@@ -144,58 +144,31 @@
 
 {% if branch == 'ai' %}
 {# ============================================
-   AI診断：結果一覧の下に置く A/B 分岐ブロック
-   （ai_check_landing.md「2. 結果画面：A/B分岐ブロック」より）
+   AI診断：結果一覧の下に置く 相談導線ブロック
    ============================================ #}
 <section class="plain-block cta-block">
   <div class="card cta-card">
-    <div class="section-title">今回のチェックのあとに</div>
+    <div class="section-title">結果について相談する</div>
     <p class="note note-left" style="margin-top:8px;">
       今回のチェックでは、AIを安全に使うための“いまの状態”を整理しました。<br>
-      AIを安全に使うには、土台となるIT運用そのものが整っていることが前提になります。次のいずれかへお進みください。
+      整理した結果をもとに、AIの安全な使い方〜IT運用の改善まで、IT顧問としてご相談に乗ります。
     </p>
 
-    {# 選択肢A：自分で深掘りしたい人向け #}
-    <div class="item-block" style="margin-top:14px;">
-      <div class="item-label">A. IT運用全体のリスクも整理する</div>
-      <p class="muted">
-        AIに限らず、端末・データ・バックアップ・職員ルールまで含めた事務所全体のIT運用を診断できます。
-        現在は弁護士事務所向けの診断を公開しています（他士業の方は、下記Bのご相談もご利用ください）。
-      </p>
-      {% if not is_pdf %}
-        <div class="cta-actions" style="margin-top:10px;">
-          <a class="btn" href="{{ lawyer_url }}">弁護士事務所向け ITリスク・セキュリティ自己診断へ</a>
-        </div>
-      {% else %}
-        <div class="pdf-contact-note">
-          弁護士事務所向け ITリスク・セキュリティ自己診断：<br>
-          https://security.aokishoji.com/lawyer-it-risk
-        </div>
-      {% endif %}
-    </div>
-
-    {# 選択肢B：相談したい人向け #}
-    <div class="item-block" style="margin-top:14px;">
-      <div class="item-label">B. 結果について相談する</div>
-      <p class="muted">
-        整理した結果をもとに、AIの安全な使い方〜IT運用の改善まで、IT顧問としてご相談に乗ります。
-      </p>
-      {% if not is_pdf %}
-        <div class="cta-actions" style="margin-top:10px;">
-          <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
-            結果について相談する
-          </a>
-          <a class="btn" href="{{ lawoffice_url }}" target="_blank" rel="noopener">
-            IT顧問サービスを見る
-          </a>
-        </div>
-      {% else %}
-        <div class="pdf-contact-note">
-          ご相談：{{ contact_url }}<br>
-          IT顧問サービス：{{ lawoffice_url }}
-        </div>
-      {% endif %}
-    </div>
+    {% if not is_pdf %}
+      <div class="cta-actions" style="margin-top:14px;">
+        <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
+          結果について相談する
+        </a>
+        <a class="btn" href="{{ lawoffice_url }}" target="_blank" rel="noopener">
+          IT顧問サービスを見る
+        </a>
+      </div>
+    {% else %}
+      <div class="pdf-contact-note">
+        ご相談：{{ contact_url }}<br>
+        IT顧問サービス：{{ lawoffice_url }}
+      </div>
+    {% endif %}
 
     <p class="note note-left" style="margin-top:14px;">
       ※このチェックは「AIを使うか・使わないか」を決めるものではなく、<strong>使うなら安全に</strong>を実現するための入口です。
