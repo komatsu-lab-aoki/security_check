@@ -970,3 +970,51 @@ details.genre[open] .genre-arrow{ transform: rotate(180deg); }
   color: #666;
   font-size: 0.95rem;
 }
+
+/* ---- PDF生成中オーバーレイ ---- */
+.pdf-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20,20,20,0.45);
+}
+.pdf-overlay[hidden]{ display: none; }
+.pdf-overlay-card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 28px 32px;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+}
+.pdf-spinner{
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 16px;
+  border: 4px solid var(--primary-weak);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: pdf-spin 0.8s linear infinite;
+}
+.pdf-overlay-title{
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+.pdf-overlay-sub{
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@keyframes pdf-spin{
+  to{ transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce){
+  .pdf-spinner{ animation-duration: 1.6s; }
+}

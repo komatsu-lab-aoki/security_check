@@ -54,7 +54,7 @@
 
   {% if not is_pdf %}
     <div class="cta-actions summary-actions">
-      <a class="btn primary" href="{{ pdf_url }}">PDFをダウンロード</a>
+      <a class="btn primary" href="{{ pdf_url }}" id="pdfDownloadBtn" data-pdf-url="{{ pdf_url }}">PDFをダウンロード</a>
       <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener">
         診断結果をもとに相談する
       </a>
@@ -279,5 +279,67 @@
     <p>※ご回答内容は、問い合わせフォーム等へ入力・添付しない限り、この端末の外に出ることはありません。</p>
   {% endif %}
 </div>
+
+{% if not is_pdf %}
+{# PDF生成中（サーバー側でPlaywright実行）に「作成中」を表示するためのオーバーレイ #}
+<div id="pdfOverlay" class="pdf-overlay" role="alert" aria-live="assertive" hidden>
+  <div class="pdf-overlay-card">
+    <div class="pdf-spinner" aria-hidden="true"></div>
+    <div class="pdf-overlay-title">PDFを作成しています…</div>
+    <div class="pdf-overlay-sub">数秒かかります。このままお待ちください。</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('pdfDownloadBtn');
+  var overlay = document.getElementById('pdfOverlay');
+  if (!btn || !overlay || !window.fetch) return; // 古い環境は通常リンク動作にフォールバック
+
+  function show() { overlay.hidden = false; }
+  function hide() { overlay.hidden = true; }
+
+  function filenameFromHeader(res, fallback) {
+    var cd = res.headers.get('Content-Disposition') || '';
+    var m = cd.match(/filename="?([^"]+)"?/);
+    return (m && m[1]) ? m[1] : fallback;
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (btn.getAttribute('aria-busy') === 'true') return; // 二重クリック防止
+    btn.setAttribute('aria-busy', 'true');
+    show();
+
+    var url = btn.getAttribute('data-pdf-url') || btn.href;
+    fetch(url, { credentials: 'same-origin' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('status ' + res.status);
+        var name = filenameFromHeader(res, 'result.pdf');
+        return res.blob().then(function (blob) { return { blob: blob, name: name }; });
+      })
+      .then(function (data) {
+        var objUrl = URL.createObjectURL(data.blob);
+        var a = document.createElement('a');
+        a.href = objUrl;
+        a.download = data.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        // 解放は少し遅らせる（ダウンロード開始を確実にするため）
+        setTimeout(function () { URL.revokeObjectURL(objUrl); }, 1500);
+      })
+      .catch(function () {
+        // 失敗時は通常リンクで開く（最終フォールバック）
+        window.location.href = url;
+      })
+      .then(function () {
+        hide();
+        btn.removeAttribute('aria-busy');
+      });
+  });
+})();
+</script>
+{% endif %}
 
 {% endblock %}
