@@ -1,47 +1,40 @@
 {# templates/start_shigyo_ai_check.html #}
+{# 最小スタート画面（フルLPにしない）。
+   本格的な紹介LPは本体サイト（aokishoji.com/shigyo-ai）に一本化しているため、
+   ここは noindex の薄いスタート画面に留める。 #}
 {% extends "base.html" %}
 
-{% block title %}士業のための AI安全活用 セルフチェック｜無料・約3分｜青木商事{% endblock %}
+{% block title %}士業向け AI安全活用 セルフチェック｜青木商事{% endblock %}
 
-{% block description %}弁護士・税理士・社労士・司法書士など士業向けの無料セルフチェック。顧客情報を守りながらAIを安全に使えているかを、全5観点・7問で約3分で整理。アカウント登録不要。{% endblock %}
+{% block description %}士業向けのAI安全活用セルフチェック。AIを安全に使えているかを約3分で整理します。アカウント登録不要。{% endblock %}
 
-{% block robots %}index,follow{% endblock %}
+{# 薄いページ／本体サイトのLPと競合させないため noindex #}
+{% block robots %}noindex,follow{% endblock %}
 
 {% block canonical %}https://security.aokishoji.com/shigyo-ai-check{% endblock %}
 
-{# og_url は base.html のデフォルト（canonicalと同じ）でOK #}
-
 {% block content %}
 
-<nav class="breadcrumb breadcrumb--optional" aria-label="パンくず">
-  <a href="/shigyo-ai-check">トップ</a>
-  <span aria-hidden="true">›</span>
-  <span>AI安全活用 セルフチェック</span>
-</nav>
-
-{# ✅ ヒーローと本文を“同じ左寄せカラム”に統一 #}
 <div class="page-narrow">
 
   <header class="hero hero--simple">
-    <h1 class="hero-title serif">士業のための<br>AI安全活用 セルフチェック</h1>
+    <h1 class="hero-title serif">士業向け<br>AI安全活用 セルフチェック</h1>
 
     <p class="hero-lead hero-lead--tight">
-      AIを「使うか・使わないか」ではなく、<strong>顧客情報を守りながら安全に使えているか</strong>を、短時間で整理するセルフチェックです。
+      AIを“安全に”使えているか、3分で整理できます。
     </p>
 
     <div class="hero-card">
-      <p class="hero-meta hero-meta--tight">
-        無料｜アカウント登録不要｜所要時間 約3分<br>
-        回答形式：はい／いいえ／わからない（全{{ total_sections }}観点・{{ total_questions }}問）
-      </p>
-      <p class="hero-assurance">
-        AI活用の“いまの状態”が分かります
-      </p>
+      <div class="hero-meta">
+        <span class="pill">無料</span>
+        <span class="pill">3分でできる</span>
+        <span class="pill">アカウント登録不要</span>
+      </div>
 
       <div class="hero-cta hero-cta--simple">
         <form action="{{ url_for('ai_start_check') }}" method="post" onsubmit="trackStartDiagnosis(event, 'top');">
           <button class="btn primary btn-hero" type="submit">
-            チェックを開始する（無料）
+            チェックを始める
           </button>
         </form>
         <p class="hero-note hero-note--tight">
@@ -50,185 +43,6 @@
       </div>
     </div>
   </header>
-
-
-  {# =========================
-     SEO/AIO 本文
-     ========================= #}
-  <main class="content content--article">
-    <section class="block">
-      <h2 class="serif">「AIは便利そう。でも、顧問先の情報を預けて大丈夫？」</h2>
-      <p>
-        弁護士・税理士・社労士・司法書士など、士業の現場でいま最も多い悩みがこれです。
-        AI活用は進めたい。けれど、依頼者・顧問先の個人情報や機密を扱う以上、
-        「どこまで入力していいのか」が分からないまま使うのは怖い——。
-      </p>
-      <p>
-        このチェックは、その不安を<strong>感覚から「整理された状態」に変える</strong>ためのものです。
-        使う／使わないの結論を急ぐ前に、まず現状を見える化します。
-      </p>
-    </section>
-
-    <section class="block">
-      <h2 class="serif">こんな使い方、していませんか？</h2>
-      <h3>無料のAIに、顧客情報をそのまま入力</h3>
-      <p>
-        便利だからと実名・案件内容を入力。そのサービスが入力内容を学習・保存している可能性に
-        気づいていない、というケースが少なくありません。
-      </p>
-      <h3>ルールが人によってバラバラ</h3>
-      <p>
-        「誰が・何を・どのAIに入れていいか」が決まっておらず、職員それぞれの判断で使っている。
-        把握できない利用が広がる入口になります。
-      </p>
-      <h3>AIの答えを、確認せずそのまま使う</h3>
-      <p>
-        AIはもっともらしい誤りを出すことがあります。検証なしで成果物や助言に乗せると、
-        そのまま誤りが外に出てしまいます。
-      </p>
-    </section>
-
-    <section class="block">
-      <h2 class="serif">「できていない＝悪い」ではありません</h2>
-      <p>
-        すべてを完璧に揃えるのは現実的ではありません。
-        このチェックは点数をつけて評価するものではなく、
-        <strong>現状を言語化し、優先順位をつけて、少ない手数からリスクを下げる</strong>ための整理ツールです。
-      </p>
-    </section>
-
-    <section class="block">
-      <h2 class="serif">5つの観点で、AI活用の「いまの状態」が分かります</h2>
-      <ul class="list">
-        <li><strong>① 目的</strong>：何のためにAIを使うか、方針が定まっているか</li>
-        <li><strong>② 情報の線引き</strong>：入力していい情報／だめな情報が分かれているか ＜最重要＞</li>
-        <li><strong>③ 業務の切り分け</strong>：AIに任せる業務・任せない業務、出力の確認体制</li>
-        <li><strong>④ ツールの選定</strong>：使っているAIが「学習に使わない／法人向け」か</li>
-        <li><strong>⑤ ルール・運用</strong>：利用ルールの明文化、守秘義務との整合</li>
-      </ul>
-    </section>
-
-    <section class="block">
-      <h2 class="serif">優先順位が分かり、相談・共有の材料になります</h2>
-      <h3>まず着手すべき論点が明確になる</h3>
-      <p>
-        「高／中／低」で、いま手をつけるべきところが整理されます。
-      </p>
-      <h3>所内・顧問先への説明材料になる</h3>
-      <p>
-        AIのリスクを“感覚”ではなく項目として共有でき、所内ルールづくりや
-        顧問先への説明にそのまま使えます。
-      </p>
-    </section>
-
-    <section class="block">
-      <h2 class="serif">無料・アカウント登録不要</h2>
-      <p>回答内容は保存されず、端末内で完結します。安心して現状整理にご利用ください。</p>
-    </section>
-
-    <div class="faq-divider"></div>
-
-    <section class="block">
-      <h2 class="serif">よくあるご質問（FAQ）</h2>
-      <p class="faq-lead">ご利用前によくいただくご質問をまとめました。</p>
-
-      <div class="faq">
-        <details class="faq-item">
-          <summary>このセルフチェックは本当に無料ですか？</summary>
-          <p>はい、完全に無料です。結果の確認まで費用は一切かかりません。自動課金や申込みもありません。</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>回答内容や事務所名は保存されますか？</summary>
-          <p>いいえ。回答内容や事務所名が外部に送信・保存されることはありません。事務所内でAI活用の現状を整理する目的でご利用いただけます。</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>小規模な事務所でも意味はありますか？</summary>
-          <p>はい、むしろ有効です。小規模なほどルールが属人化しやすく、「気づかないうちに機密を入力していた」が起きやすいためです。</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>ITやAIの専門知識がなくても回答できますか？</summary>
-          <p>はい。「はい／いいえ／わからない」で答えられ、専門用語はできるだけ避けています。</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>結果を見たあと、必ず相談しなければいけませんか？</summary>
-          <p>いいえ。結果は現状把握・所内共有にご利用ください。必要な場合のみ、お気軽にご相談いただけます。</p>
-        </details>
-      </div>
-    </section>
-
-    <section class="block">
-      <div class="cta-card">
-        <h2 class="serif">AI活用の現状を、3分で整理する</h2>
-        <p class="cta-lead">
-          使う／使わないを決める前に、まずは“いまの状態”を見える化します。
-        </p>
-
-        <form action="{{ url_for('ai_start_check') }}" method="post" onsubmit="trackStartDiagnosis(event, 'bottom');">
-          <button class="btn primary btn-hero" type="submit">
-            チェックを開始する（無料）
-          </button>
-        </form>
-
-        <p class="hero-note hero-note--tight">
-          ※アカウント登録不要・無料。回答内容は保存されず、この端末の中だけで完結します。
-        </p>
-      </div>
-    </section>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "このセルフチェックは本当に無料ですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "はい、完全に無料です。結果の確認まで費用は一切かかりません。自動課金や申込みもありません。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "回答内容や事務所名は保存されますか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "いいえ。回答内容や事務所名が外部に送信・保存されることはありません。事務所内でAI活用の現状を整理する目的でご利用いただけます。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "小規模な事務所でも意味はありますか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "はい、むしろ有効です。小規模なほどルールが属人化しやすく、「気づかないうちに機密を入力していた」が起きやすいためです。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "ITやAIの専門知識がなくても回答できますか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "はい。「はい／いいえ／わからない」で答えられ、専門用語はできるだけ避けています。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "結果を見たあと、必ず相談しなければいけませんか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "いいえ。結果は現状把握・所内共有にご利用ください。必要な場合のみ、お気軽にご相談いただけます。"
-          }
-        }
-      ]
-    }
-    </script>
-
-  </main>
 
 </div>
 

@@ -435,16 +435,10 @@ def result_pdf():
 # B. 士業向け AI安全活用 セルフチェック
 # =====================================================
 
-# ① SEO用 LP
+# ① 最小スタート画面（紹介LPは本体サイトに一本化／このページは noindex）
 @app.get("/shigyo-ai-check")
 def start_shigyo_ai_check():
-    total_questions = sum(len(sec["items"]) for sec in AI_SECTIONS_SHORT)
-    return render_template(
-        "start_shigyo_ai_check.html",
-        total_sections=len(AI_SECTIONS_SHORT),
-        total_questions=total_questions,
-        choices=CHOICES,
-    )
+    return render_template("start_shigyo_ai_check.html")
 
 
 # ② 診断スタート（LPのボタンから POST）
