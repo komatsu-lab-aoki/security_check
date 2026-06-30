@@ -170,20 +170,6 @@
       </div>
     {% endif %}
 
-    {# 会議・議事録の設問に「いいえ／わからない」のときだけ表示する情報提供メッセージ #}
-    {% if show_minutes_consult %}
-      <div class="pdf-contact-note" style="margin-top:14px;">
-        会議の録音や議事録をAIで扱うことに不安がある場合、事務所内にデータをとどめたまま、音声のテキスト化や要約を行う仕組みをつくる方法もあります。気になる方はお気軽にご相談ください。
-        {% if not is_pdf %}
-          <div class="cta-actions" style="margin-top:10px;">
-            <a class="btn" href="{{ contact_url }}" target="_blank" rel="noopener">相談する</a>
-          </div>
-        {% else %}
-          <br>ご相談：{{ contact_url }}
-        {% endif %}
-      </div>
-    {% endif %}
-
     <p class="note note-left" style="margin-top:14px;">
       ※このチェックは「AIを使うか・使わないか」を決めるものではなく、<strong>使うなら安全に</strong>を実現するための入口です。
     </p>
