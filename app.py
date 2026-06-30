@@ -298,11 +298,26 @@ def _render_result(
     """結果ページの共通処理（弁護士／AI 共用）。"""
     answers = session.get(answers_key, {}) or {}
     ctx = build_result_context(sections=sections, answers=answers, is_pdf=is_pdf)
+
+    # 会議・議事録の設問（ai_task_minutes）が「対応項目」として出ているとき
+    # （＝ no/unknown 回答）だけ、結果画面に相談導線メッセージを出す。
+    # 設問本文・判定・アドバイスには手を入れず、表示フラグのみ算出する。
+    show_minutes_consult = False
+    for _, item in iter_items(sections):
+        if item.get("id") == "ai_task_minutes":
+            show_if = item.get("show_if_answer_in", ["no", "unknown"])
+            ans = answers.get("ai_task_minutes", "unknown")
+            if ans not in VALID_ANSWERS:
+                ans = "unknown"
+            show_minutes_consult = ans in show_if
+            break
+
     ctx.update(
         kind=kind,
         start_url=start_url,
         pdf_url=pdf_url,
         branch=branch,
+        show_minutes_consult=show_minutes_consult,
     )
     return render_template("result.html", **ctx)
 
